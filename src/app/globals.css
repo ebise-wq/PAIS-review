@@ -882,3 +882,6 @@ button.secondary:disabled { opacity: 0.45; cursor: not-allowed; }
 .filter-menu-list label:hover { background: var(--surface-2); }
 .filter-menu-list input { margin-top: 3px; flex: none; }
 .filter-menu-list .linkish { display: block; padding: 8px; font-size: 0.85rem; }
+/* Word verdicts in the admin list: smaller type, and the badge grows to fit the word. */
+.manage-score .score.score-word { width: auto; min-width: 64px; padding-inline: 8px; }
+.manage-score .score.score-word .num { font-size: 0.85rem; }
