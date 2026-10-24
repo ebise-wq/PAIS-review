@@ -5,6 +5,32 @@ import type { CommentNode, TargetType } from '@/lib/comments';
 import { timeAgo } from '@/lib/time';
 
 const USERNAME_KEY = 'pais_username';
+// Matches LIMITS.bodyMax in lib/comments.ts, which the server enforces.
+const BODY_LIMIT = 4000;
+
+/**
+ * Unsent comments are kept on the reader's device as they type, one draft per box, so a
+ * reload, a crash or a closed tab does not lose a long comment. Cleared once it posts.
+ */
+const draftKey = (type: TargetType, slug: string, parentId: number | null) =>
+  `pais_draft:${type}:${slug}:${parentId ?? 'top'}`;
+
+function readDraft(key: string): string {
+  try {
+    return localStorage.getItem(key) ?? '';
+  } catch {
+    return '';
+  }
+}
+
+function writeDraft(key: string, body: string) {
+  try {
+    if (body.trim()) localStorage.setItem(key, body);
+    else localStorage.removeItem(key);
+  } catch {
+    // Private browsing or full storage: the comment still works, it just is not kept.
+  }
+}
 const MAX_INDENT = 4;
 
 interface Loaded {
@@ -29,6 +55,16 @@ export function Comments({
 }) {
   const [data, setData] = useState<Loaded | null>(null);
   const [username, setUsername] = useState('');
+  // Remembered as it is typed, like the draft, so a reload does not leave a kept draft
+  // that cannot be posted until the name is typed again.
+  const changeUsername = (name: string) => {
+    setUsername(name);
+    try {
+      localStorage.setItem(USERNAME_KEY, name);
+    } catch {
+      // fine
+    }
+  };
   const [replyTo, setReplyTo] = useState<number | null>(null);
   const [collapsed, setCollapsed] = useState<Set<number>>(() => new Set());
   const [error, setError] = useState<string | null>(null);
@@ -123,7 +159,7 @@ export function Comments({
           slug={slug}
           parentId={null}
           username={username}
-          onUsername={setUsername}
+          onUsername={changeUsername}
           onPosted={() => load()}
         />
       )}
@@ -149,7 +185,7 @@ export function Comments({
                 slug={slug}
                 parentId={parentId}
                 username={username}
-                onUsername={setUsername}
+                onUsername={changeUsername}
                 onPosted={() => {
                   setReplyTo(null);
                   load();
@@ -333,10 +369,26 @@ function CommentForm({
   onPosted: () => void;
   onCancel?: () => void;
 }) {
+  const key = draftKey(type, slug, parentId);
   const [body, setBody] = useState('');
+  const [restored, setRestored] = useState(false);
   const [website, setWebsite] = useState('');
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
+
+  // Read after mounting: the server has no device storage, and the first render must match.
+  useEffect(() => {
+    const saved = readDraft(key);
+    if (saved) {
+      setBody(saved);
+      setRestored(true);
+    }
+  }, [key]);
+
+  const change = (value: string) => {
+    setBody(value);
+    writeDraft(key, value);
+  };
 
   async function submit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -356,6 +408,8 @@ function CommentForm({
           // fine
         }
         setBody('');
+        writeDraft(key, '');
+        setRestored(false);
         onPosted();
       } else {
         setError(json.error ?? 'Could not post the comment.');
@@ -385,10 +439,19 @@ function CommentForm({
         aria-label={parentId === null ? 'Comment' : 'Reply'}
         rows={4}
         value={body}
-        onChange={(event) => setBody(event.target.value)}
-        maxLength={4000}
+        onChange={(event) => change(event.target.value)}
         required
       />
+      {/* No maxLength on the box: it would silently cut off a long paste. Say so instead. */}
+      {(restored || body.length > BODY_LIMIT * 0.9) && (
+        <p className={`comment-form-note${body.length > BODY_LIMIT ? ' over' : ''}`}>
+          {restored && 'Your unsent draft was kept. '}
+          {body.length > BODY_LIMIT * 0.9 &&
+            `${body.length.toLocaleString('en-GB')} / ${BODY_LIMIT.toLocaleString('en-GB')} characters${
+              body.length > BODY_LIMIT ? ': shorten it, or split it into a reply' : ''
+            }`}
+        </p>
+      )}
       {/* Honeypot: hidden from people, filled by bots. */}
       <input
         type="text"
@@ -401,7 +464,7 @@ function CommentForm({
         aria-hidden="true"
       />
       <div className="comment-form-row">
-        <button className="primary" type="submit" disabled={busy}>
+        <button className="primary" type="submit" disabled={busy || body.length > BODY_LIMIT}>
           {busy ? 'Posting…' : parentId === null ? 'Post comment' : 'Post reply'}
         </button>
         {onCancel && (

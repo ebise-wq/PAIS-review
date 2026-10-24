@@ -154,3 +154,11 @@ export function describeDbError(error: unknown): string {
 export async function pingDb(): Promise<void> {
   await query('select 1');
 }
+
+/** Closes the pool, so a test run or script can exit. The site never calls this. */
+export async function closeDb(): Promise<void> {
+  const open = pool;
+  pool = undefined;
+  schemaReady = undefined;
+  await open?.end();
+}
