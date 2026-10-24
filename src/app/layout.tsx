@@ -13,6 +13,11 @@ export function generateMetadata(): Metadata {
     title: { default: text['site.name'], template: `%s · ${text['site.name']}` },
     description: text['site.description'],
     openGraph: { title: text['site.name'], description: text['site.description'], type: 'website', siteName: text['site.name'] },
+    // While the pilot banner is up, Google and Bing are asked not to list the site. Only
+    // those two: AI crawlers ignore these tags, so the reviews still reach them.
+    ...(text['site.pilotBanner'].trim()
+      ? { robots: { googleBot: { index: false } }, other: { bingbot: 'noindex' } }
+      : {}),
     twitter: { card: 'summary_large_image' },
   };
 }

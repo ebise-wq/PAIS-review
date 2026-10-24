@@ -44,7 +44,7 @@ export const FIELDS = {
   'nav.about': line('Menu: about', 'Third link in the header menu.', 'About', 24),
   'site.pilotBanner': md(
     'Pilot banner',
-    'Coloured strip under the header on every page. Leave empty to remove it.',
+    'Coloured strip under the header on every page. Leave empty to remove it. While it has text, Google and Bing are asked not to list the site.',
     'Early pilot. These reviews are AI-written and lightly checked — expect rough edges, and treat any single review as one reading, not a verdict.',
     { optional: true, max: 400 },
   ),
