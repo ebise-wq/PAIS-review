@@ -275,7 +275,7 @@ export function ReviewView({ review, banner }: { review: Review; banner?: ReactN
             instruction={text['discuss.prompt']}
           />
 
-          <Comments type="review" slug={review.slug} intro={<RichText text={text['comments.intro']} inline />} />
+          <Comments type="review" slug={review.slug} />
         </>
       )}
 

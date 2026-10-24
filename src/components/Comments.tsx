@@ -23,12 +23,9 @@ interface Loaded {
 export function Comments({
   type,
   slug,
-  intro,
 }: {
   type: TargetType;
   slug: string;
-  /** Editable site text, rendered by the server page. */
-  intro: React.ReactNode;
 }) {
   const [data, setData] = useState<Loaded | null>(null);
   const [username, setUsername] = useState('');
@@ -119,7 +116,6 @@ export function Comments({
       <h2>
         {count === 0 ? 'Comments' : `${count} comment${count === 1 ? '' : 's'}`}
       </h2>
-      <p className="comments-intro">{intro}</p>
 
       {replyTo === null && (
         <CommentForm

@@ -4,7 +4,6 @@ import { getDoc, renderTemplate } from '@/lib/doc';
 import { site } from '@/lib/site';
 import { Markdown } from '@/components/Markdown';
 import { Comments } from '@/components/Comments';
-import { RichText } from '@/components/RichText';
 import { getSiteText } from '@/lib/site-text';
 import { dbConfigured } from '@/lib/db';
 import { extractToc, type TocEntry } from '@/lib/toc';
@@ -94,7 +93,7 @@ export default function MethodsPage() {
         </div>
       </div>
 
-      <Comments type="guide" slug="guide" intro={<RichText text={text['comments.intro']} inline />} />
+      <Comments type="guide" slug="guide" />
     </article>
   );
 }
