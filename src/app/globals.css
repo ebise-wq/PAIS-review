@@ -331,10 +331,11 @@ button.linkish.inline { font-size: inherit; color: var(--accent); }
   margin: 36px 0 0; padding: 14px 16px; max-width: 42rem;
   border: 1px dashed var(--border-strong); border-radius: var(--radius);
 }
-.guide-notes h3 {
-  font-size: 0.78rem; text-transform: uppercase; letter-spacing: 0.06em;
-  color: var(--muted); margin: 0 0 6px; font-weight: 600;
+.guide-notes > summary {
+  cursor: pointer; font-size: 0.78rem; text-transform: uppercase; letter-spacing: 0.06em;
+  color: var(--muted); font-weight: 600;
 }
+.guide-notes[open] > summary { margin-bottom: 8px; }
 .guide-notes p { margin: 0 0 8px; font-size: 0.85rem; color: var(--muted); }
 .guide-notes ul { margin: 0; padding-left: 18px; font-size: 0.92rem; }
 
@@ -885,3 +886,7 @@ button.secondary:disabled { opacity: 0.45; cursor: not-allowed; }
 /* Word verdicts in the admin list: smaller type, and the badge grows to fit the word. */
 .manage-score .score.score-word { width: auto; min-width: 64px; padding-inline: 8px; }
 .manage-score .score.score-word .num { font-size: 0.85rem; }
+
+/* Review sections after the body, reached from the contents list, land clear of the sticky bar. */
+#further-context, #notes-for-the-guide, #what-claude-read { scroll-margin-top: 72px; }
+@media (min-width: 1020px) { #further-context, #notes-for-the-guide, #what-claude-read { scroll-margin-top: 20px; } }

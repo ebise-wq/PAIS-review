@@ -23,6 +23,10 @@ import { conditionTag, tagsOf } from '@/lib/tags';
  * the banner goes on top, and the parts that write to the live database — ratings,
  * comments — and the AI discussion links, which point at the public raw file, are left out.
  */
+const CONTEXT_ID = 'further-context';
+const NOTES_ID = 'notes-for-the-guide';
+const READ_ID = 'what-claude-read';
+
 export function ReviewView({ review, banner }: { review: Review; banner?: ReactNode }) {
   const text = getSiteText();
   const tagList = getTags();
@@ -32,7 +36,13 @@ export function ReviewView({ review, banner }: { review: Review; banner?: ReactN
   const link = paperLink(review);
   // The executive summary is written last and shown first.
   const body = displayOrder(review.body);
-  const toc = extractToc(body);
+  // The sections after the body are part of the review too, so they are in its contents.
+  const toc = [
+    ...extractToc(body),
+    ...(review.context?.length ? [{ id: CONTEXT_ID, text: text['review.contextHeading'] }] : []),
+    ...(review.guideNotes?.length ? [{ id: NOTES_ID, text: text['review.guideNotesHeading'] }] : []),
+    { id: READ_ID, text: text['label.access'] },
+  ];
   const reviewedOn = new Date(`${review.reviewedOn}T00:00:00Z`).toLocaleDateString('en-GB', {
     day: 'numeric',
     month: 'long',
@@ -178,43 +188,76 @@ export function ReviewView({ review, banner }: { review: Review; banner?: ReactN
 
       <div className="review-body">
         <TableOfContents entries={toc} />
-        <Markdown>{body}</Markdown>
+        {/* Everything the contents list points to sits inside this column, so the sticky
+            list stays on screen down to the last entry. */}
+        <div className="toc-main">
+          <Markdown>{body}</Markdown>
+
+        {review.context && review.context.length > 0 && (
+          <section className="context-panel" id={CONTEXT_ID}>
+            <h3>{text['review.contextHeading']}</h3>
+            <ul>
+              {review.context.map((item) => (
+                <li key={item.note}>
+                  {item.note}{' '}
+                  {item.source ? (
+                    <a href={item.source} target="_blank" rel="noreferrer">
+                      Source
+                    </a>
+                  ) : (
+                    <span className="unsourced">(no source given)</span>
+                  )}
+                </li>
+              ))}
+            </ul>
+            <div className="context-note">
+              <RichText text={text['review.contextNote']} />
+            </div>
+          </section>
+        )}
+
+        {review.guideNotes && review.guideNotes.length > 0 && (
+          <details className="guide-notes" id={NOTES_ID}>
+            <summary>
+              {text['review.guideNotesHeading']} ({review.guideNotes.length})
+            </summary>
+            <RichText text={text['review.guideNotesIntro']} />
+            <ul>
+              {review.guideNotes.map((note) => (
+                <li key={note}>{note}</li>
+              ))}
+            </ul>
+          </details>
+        )}
+
+        <aside className="provenance">
+          <p>
+            Written by {modelLabel(review, 'an unrecorded Claude model')} against{' '}
+            <Link href="/methods">the guide</Link>
+            {review.guideVersion ? ` (v${review.guideVersion})` : ''}.{' '}
+            <RichText text={text['review.provenance']} inline />
+          </p>
+          {/* Kept out of the header: there for anyone checking the review, not needed to read it. */}
+          <details className="sources-details" id={READ_ID}>
+            <summary>
+              {text['label.access']}
+              {read.length ? ` (${read.length})` : ` — ${text['access.unrecorded']}`}
+            </summary>
+            {read.length > 0 && (
+              <ul>
+                {read.map((item) => (
+                  <li key={item}>
+                    <RichText text={/^https?:\/\/\S+$/.test(item) ? `<${item}>` : item} inline />
+                  </li>
+                ))}
+              </ul>
+            )}
+          </details>
+        </aside>
+        </div>
       </div>
 
-      {review.context && review.context.length > 0 && (
-        <section className="context-panel">
-          <h3>{text['review.contextHeading']}</h3>
-          <ul>
-            {review.context.map((item) => (
-              <li key={item.note}>
-                {item.note}{' '}
-                {item.source ? (
-                  <a href={item.source} target="_blank" rel="noreferrer">
-                    Source
-                  </a>
-                ) : (
-                  <span className="unsourced">(no source given)</span>
-                )}
-              </li>
-            ))}
-          </ul>
-          <div className="context-note">
-            <RichText text={text['review.contextNote']} />
-          </div>
-        </section>
-      )}
 
-      {review.guideNotes && review.guideNotes.length > 0 && (
-        <aside className="guide-notes">
-          <h3>{text['review.guideNotesHeading']}</h3>
-          <RichText text={text['review.guideNotesIntro']} />
-          <ul>
-            {review.guideNotes.map((note) => (
-              <li key={note}>{note}</li>
-            ))}
-          </ul>
-        </aside>
-      )}
 
       {banner ? (
         <p className="preview-note">
@@ -236,30 +279,6 @@ export function ReviewView({ review, banner }: { review: Review; banner?: ReactN
         </>
       )}
 
-      <aside className="provenance">
-        <p>
-          Written by {modelLabel(review, 'an unrecorded Claude model')} against{' '}
-          <Link href="/methods">the guide</Link>
-          {review.guideVersion ? ` (v${review.guideVersion})` : ''}.{' '}
-          <RichText text={text['review.provenance']} inline />
-        </p>
-        {/* Kept out of the header: there for anyone checking the review, not needed to read it. */}
-        <details className="sources-details">
-          <summary>
-            {text['label.access']}
-            {read.length ? ` (${read.length})` : ` — ${text['access.unrecorded']}`}
-          </summary>
-          {read.length > 0 && (
-            <ul>
-              {read.map((item) => (
-                <li key={item}>
-                  <RichText text={/^https?:\/\/\S+$/.test(item) ? `<${item}>` : item} inline />
-                </li>
-              ))}
-            </ul>
-          )}
-        </details>
-      </aside>
     </article>
   );
 }
