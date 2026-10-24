@@ -14,8 +14,7 @@ model: "claude-opus-5-5"
 effort: "high"
 read:
   - "Full text"
-  - "Fig. 3 (grip strength) and Fig. 5 (correlation matrix), viewed as images"
-  - "Figs 1, 2 and 4, from captions and source data only"
+  - "Figs 1 to 5, viewed as images (Figs 1, 2 and 4 added after publication)"
   - "Supplementary information"
   - "Peer review file (Supplementary Information 2)"
   - "Source data spreadsheet, used for the women-only reanalysis of Fig. 5"
@@ -80,7 +79,7 @@ The work-up to rule out other causes was thorough by the standard of this field.
 
 Two weaknesses remain. First, psychiatric illness was screened only with the 9-item Patient Health Questionnaire (PHQ-9), not with a clinical interview (see below). Second, people with "relevant cardiac, respiratory, neurological, or psychiatric comorbidity" were excluded. That makes the group cleaner, but it may also remove some true cases.
 
-The split between groups was mostly about PEM. 18 of the 23 who did not meet the criteria had PEM lasting under 14 hours, and 8 of 23 did not meet the cognitive criteria. So the "non-ME/CFS" group is a group of people with shorter PEM. It is not a group without PEM. All 23 reported PEM (Table 2).
+The split between groups was mostly about PEM. 18 of the 23 who did not meet the criteria had PEM lasting under 14 hours, and 8 of 23 did not meet the cognitive criteria. So the "non-ME/CFS" group is a group of people with shorter PEM. It is not a group without PEM. All 23 rated PEM at 1 or more on the symptom scale (Table 2), though one scored 0 for PEM severity on the PEM questionnaire (Fig. 2). Fig. 2 shows how sharp the split is: 17 of the 23 reported PEM lasting 2–10 hours, while all 19 in the PCS/ME/CFS group reported 14 hours or more, 15 of them over 24 hours. 5 of the 23 had PEM of 14 hours or more but missed other criteria.
 
 ### Comparison group
 
@@ -88,14 +87,14 @@ The non-COVID ME/CFS group is a sensible comparator for "is post-COVID ME/CFS th
 
 ### Conditions the guide asks about
 
-- **Postural orthostatic tachycardia syndrome (POTS) and orthostatic intolerance:** measured with a 10-minute active stand test. 4 people in the PCS/ME/CFS group and 1 in the PCS/non-ME/CFS group met POTS criteria. Orthostatic hypotension was found in 6 and 1. This is reported only for the PCS groups.
+- **Postural orthostatic tachycardia syndrome (POTS) and orthostatic intolerance:** measured with a 10-minute active stand test. 4 people in the PCS/ME/CFS group and 1 in the PCS/non-ME/CFS group met POTS criteria. Orthostatic hypotension was found in 6 and 1. This is reported only for the PCS groups, and the figure (Fig. 4) shows women only. In the women, median heart rate rose by roughly 10–15 beats per minute on standing in both groups, so most did not have marked tachycardia.
 - **Mast cell activation syndrome (MCAS):** not mentioned.
-- **Severity:** measured with the Bell disability scale. The median was 40 for all PCS patients (50 in PCS/non-ME/CFS) and 30 for non-COVID ME/CFS. A score of 30–40 means someone can do light work for 2–4 hours a day. These are mostly moderately affected people who could travel to a clinic. Severely affected, housebound people are absent, as one would expect from a clinic-based design.
+- **Severity:** measured with the Bell disability scale. The median was 40 for all PCS patients (50 in PCS/non-ME/CFS) and, by the paper's text, 30 for non-COVID ME/CFS. Fig. 1 shows a median nearer 35 for that group (n = 18), so the text and figure do not quite agree. A score of 30–40 means someone can do light work for 2–4 hours a day. These are mostly moderately affected people who could travel to a clinic. Severely affected, housebound people are absent, as one would expect from a clinic-based design.
 - **Illness duration:** 6 months in the PCS groups, about 13 months in the comparison group.
 
 ## Outcome measures
 
-Most outcomes are questionnaires: the Chalder Fatigue Questionnaire (CFQ), the Bell scale, the 36-item Short Form Health Survey (SF-36), the PEM questionnaire, the Composite Autonomic Symptom Score (COMPASS-31), a 1–10 rating of each CCC symptom, the 9-item Patient Health Questionnaire and the Epworth Sleepiness Scale. For a descriptive study, that is fine. Nothing here is a treatment effect that expectation could inflate. One reviewer noted that the Bell scale has not been formally validated.
+Most outcomes are questionnaires: the Chalder Fatigue Questionnaire (CFQ), the Bell scale, the 36-item Short Form Health Survey (SF-36), the PEM questionnaire, the Composite Autonomic Symptom Score (COMPASS-31), a 1–10 rating of each CCC symptom, the 9-item Patient Health Questionnaire and the Epworth Sleepiness Scale. For a descriptive study, that is fine. Nothing here is a treatment effect that expectation could inflate. One reviewer noted that the Bell scale has not been formally validated. The SF-36 role-limitations score sits at the floor: every PCS/ME/CFS patient and most PCS/non-ME/CFS patients scored 0 (Fig. 1). So the significant difference between the two groups on that score comes from a handful of people in the non-ME/CFS group who scored above 0.
 
 **Hand grip strength.** Hand grip strength (HGS) was measured as ten maximal pulls, repeated 60 minutes later. The paper treats it as a measure of muscle fatigue: "HGS is a reliable parameter to assess muscle fatigue". The guide puts grip strength in the high-risk group for performance bias, because it depends on effort. Here the effort concern is less about expectation and more about the fact that a person who feels ill, or fears PEM, may not pull at full force. That does not make the measure useless, but it is not an objective muscle measure. Both tests come after the effort of travel to the clinic, the second one 60 minutes into the clinic visit, and PEM status on the day was not recorded.
 
