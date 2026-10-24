@@ -12,4 +12,4 @@ Be careful with parroting online comments on research - evaluate the comment in 
 
 Make sure you have access to the whole paper, and ideally also graphs. Plus supplementary files when needed.
 
-For a paper or preprint: if you cannot open the full text, stop and ask for it (a PDF or a link) instead of writing the review. Never review a paper from its abstract alone.
+For a paper or preprint: if you cannot open the full text, stop and ask for it (a PDF or a link) instead of writing the review. Never review a paper from its abstract alone. Look at every figure in the main text as an image, not only its caption; if you cannot see them, ask for them before you write.
