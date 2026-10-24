@@ -240,6 +240,7 @@ export function buildReviewFile(
     guideVersion: text(data.guideVersion) ?? fallbackGuideVersion,
     model: text(data.model),
     effort: text(data.effort)?.toLowerCase(),
+    read: strings(data.read),
     access: accessOf(data.access),
     sources: strings(data.sources),
     humanInput: options.humanInput ?? humanInputOf(data.humanInput),

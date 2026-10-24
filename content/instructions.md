@@ -21,6 +21,9 @@ rather than just parroting.
 Make sure you have access to the whole paper, and ideally also graphs. Plus supplementary files
 when needed.
 
+For a paper or preprint: if you cannot open the full text, stop and ask for it (a PDF or a
+link) instead of writing the review. Never review a paper from its abstract alone.
+
 Before reviewing anything, fetch and read the current guide at {{SITE_URL}}/guide.md. It is
 specific to these conditions in ways generic appraisal checklists are not — PEM ascertainment,
 case definitions, which outcome measures are actually effort-independent. Always fetch it
@@ -87,12 +90,11 @@ reviewedOn: <today, YYYY-MM-DD>
 guideVersion: "{{GUIDE_VERSION}}"
 model: "<the exact model ID writing this, e.g. claude-opus-5>"
 effort: "<the reasoning effort you ran at, e.g. high — only if you know it>"
-access:                   # what you actually opened in this conversation — see below
-  fullText: true          # the whole paper, not only the abstract
-  figures: true
-  supplement: false
-sources:                  # everything else you read: links, or a short description of a file
-  - "<url>"
+read:                     # everything you opened in this conversation, one line each — see below
+  - "<e.g. Full text, from the publisher's PDF>"
+  - "<e.g. Figures 1 to 4, viewed as images>"
+  - "<e.g. Supplementary tables S1 to S3>"
+  - "<e.g. Trial registration: https://...>"
 ---
 ```
 
@@ -105,13 +107,13 @@ running at. If you cannot tell, leave it out; the editor can add it.
 Never add `humanInput`. It records how much the editor changed your text, which only the
 editor knows, and it is set when the review is published.
 
-`access` and `sources` record what you actually opened in this conversation, not what exists
-or what you remember about the paper. `fullText: true` only if you read the whole paper, not
-just the abstract; `figures` and `supplement` likewise. A review written from the abstract
-alone reads the same as one written from the full paper, and these fields are how a reader
-tells them apart. If you could not see something that matters, say so in the review and lower
-`confidence`. List in `sources` every other document or page you read — the trial
-registration, a press release, a commentary — as a link where there is one.
+`read` records what you actually opened in this conversation, not what exists or what you
+remember about the paper. One line per thing, saying what it was and how you read it: the
+full text and where it came from; which figures you saw as images and which only from their
+captions; which supplementary files; and every other document or page — the trial
+registration, a press release, a commentary — as a link where there is one. A reader uses
+this list to check what the review could and could not have seen. If you could not see
+something that matters, say so in the review and lower `confidence`.
 
 No abbreviations in the frontmatter, except in the title or ones as obvious as ME/CFS. Write
 "post-exertional malaise not assessed", not "PEM not assessed". The verdict, strengths and

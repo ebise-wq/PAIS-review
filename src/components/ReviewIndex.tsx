@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import type { Review } from '@/lib/types';
 import type { Engagement } from '@/lib/comments';
 import { rankScore, ratingRank } from '@/lib/ranking';
@@ -43,7 +43,18 @@ export function ReviewIndex({
   const [sort, setSort] = useState<Sort>(hasEngagement ? 'active' : 'newest');
   const [query, setQuery] = useState('');
   const [design, setDesign] = useState('');
-  const [topic, setTopic] = useState('');
+  const [topics, setTopics] = useState<string[]>([]);
+  const topicMenu = useRef<HTMLDetailsElement>(null);
+
+  // The topic menu closes when the reader taps anywhere else, like a native menu.
+  useEffect(() => {
+    const close = (event: PointerEvent) => {
+      const menu = topicMenu.current;
+      if (menu?.open && !menu.contains(event.target as Node)) menu.open = false;
+    };
+    document.addEventListener('pointerdown', close);
+    return () => document.removeEventListener('pointerdown', close);
+  }, []);
 
   // The server rendered "3 h ago" and the ranking against its own clock. Re-run against
   // the reader's once mounted, so a cached page does not show a stale time. Starting
@@ -82,7 +93,8 @@ export function ReviewIndex({
     const filtered = reviews.filter((r) => {
       if (active.length && !active.every((c) => r.conditions?.includes(c))) return false;
       if (design && r.design !== design) return false;
-      if (topic && !r.topics?.includes(topic)) return false;
+      // Ticking several topics widens the list: a review shows if it has any of them.
+      if (topics.length && !topics.some((t) => r.topics?.includes(t))) return false;
       if (terms.length) {
         const text = haystack(r);
         const body = bodies?.[r.slug]?.toLowerCase() ?? '';
@@ -122,7 +134,7 @@ export function ReviewIndex({
           return newestFirst(a, b);
       }
     });
-  }, [reviews, active, sort, query, engagement, now, bodies, design, topic, tags]);
+  }, [reviews, active, sort, query, engagement, now, bodies, design, topics, tags]);
 
   function tagLabels(r: ReviewSummary): string[] {
     const own = tagsOf(r, tags);
@@ -188,14 +200,36 @@ export function ReviewIndex({
               </select>
             )}
             {tags.topics.length > 0 && (
-              <select aria-label={labels.topicFilter} value={topic} onChange={(e) => setTopic(e.target.value)}>
-                <option value="">{labels.anyTopic}</option>
-                {tags.topics.map((tag) => (
-                  <option key={tag.id} value={tag.id}>
-                    {tag.label}
-                  </option>
-                ))}
-              </select>
+              <details className="filter-menu" ref={topicMenu}>
+                <summary aria-label={labels.topicFilter}>
+                  {topics.length === 0
+                    ? labels.anyTopic
+                    : topics.length === 1
+                      ? tags.topics.find((t) => t.id === topics[0])?.label
+                      : `${topics.length} topics`}
+                </summary>
+                <div className="filter-menu-list">
+                  {tags.topics.map((tag) => (
+                    <label key={tag.id}>
+                      <input
+                        type="checkbox"
+                        checked={topics.includes(tag.id)}
+                        onChange={() =>
+                          setTopics((current) =>
+                            current.includes(tag.id) ? current.filter((t) => t !== tag.id) : [...current, tag.id],
+                          )
+                        }
+                      />
+                      {tag.label}
+                    </label>
+                  ))}
+                  {topics.length > 0 && (
+                    <button type="button" className="linkish" onClick={() => setTopics([])}>
+                      {labels.anyTopic}
+                    </button>
+                  )}
+                </div>
+              </details>
             )}
           </div>
         )}

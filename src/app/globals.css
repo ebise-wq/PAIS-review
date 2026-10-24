@@ -817,7 +817,6 @@ button.secondary:disabled { opacity: 0.45; cursor: not-allowed; }
 /* Design and topics on a review page: links to every review with the same tag. */
 .tag-links { display: flex; flex-wrap: wrap; gap: 6px; }
 .tag-links a { text-decoration: none; }
-.chip.tag-design { font-weight: 600; }
 .tag-page-count { color: var(--muted); margin: -6px 0 20px; }
 
 /* Admin → Tags */
@@ -842,3 +841,44 @@ button.secondary:disabled { opacity: 0.45; cursor: not-allowed; }
 .back-link a:hover { color: var(--text); }
 .sort-control { display: flex; align-items: center; flex: none; margin-left: auto; }
 .manage-tags-title { flex-basis: 100%; font-size: 0.8rem; color: var(--muted); }
+
+/* Review header: tags as one row of chips; the rest folded away for whoever wants it. */
+.head-tags { margin: 18px 0 0; }
+.facts-fold { margin: 18px 0 0; border-top: 1px solid var(--border); padding-top: 12px; }
+.facts-fold > summary { cursor: pointer; color: var(--muted); font-size: 0.88rem; }
+.facts-fold > summary:hover { color: var(--text); }
+.facts-fold .facts { border-top: 0; margin-top: 14px; padding-top: 0; }
+.sources-details p { margin: 8px 0 0; }
+.head-design { margin: 18px 0 0; font-size: 0.92rem; color: var(--muted); }
+.head-design + .head-tags { margin-top: 10px; }
+
+/* On a phone the verdict wraps around the badge instead of leaving a column of space under it. */
+@media (max-width: 640px) {
+  .verdict-box { display: block; }
+  .verdict-box::after { content: ''; display: block; clear: both; }
+  .verdict-box .score { float: left; margin: 4px 14px 6px 0; }
+}
+
+/* Strengths and weaknesses often run to two lines; a full pill pinches the text at the ends. */
+.chip.weakness, .chip.strength { border-radius: 10px; padding: 5px 11px; }
+
+/* Topic filter: a menu of tick boxes, styled to sit beside the design menu. */
+.filter-menu { position: relative; flex: 1 1 0; min-width: 0; }
+.filter-menu > summary {
+  list-style: none; cursor: pointer; font-size: 0.9rem; color: var(--text);
+  background: var(--surface); border: 1px solid var(--border-strong); border-radius: 8px;
+  padding: 6px 28px 6px 10px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; position: relative;
+}
+.filter-menu > summary::-webkit-details-marker { display: none; }
+.filter-menu > summary::after { content: '▾'; position: absolute; right: 10px; color: var(--muted); }
+.filter-menu-list {
+  position: absolute; right: 0; top: calc(100% + 4px); z-index: 20;
+  min-width: 100%; width: max-content; max-width: min(22rem, calc(100vw - 32px));
+  max-height: 60vh; overflow-y: auto; padding: 6px;
+  background: var(--surface); border: 1px solid var(--border-strong); border-radius: 10px;
+  box-shadow: 0 8px 24px rgb(0 0 0 / 0.25);
+}
+.filter-menu-list label { display: flex; align-items: flex-start; gap: 10px; padding: 8px; font-size: 0.9rem; color: var(--text); border-radius: 6px; cursor: pointer; }
+.filter-menu-list label:hover { background: var(--surface-2); }
+.filter-menu-list input { margin-top: 3px; flex: none; }
+.filter-menu-list .linkish { display: block; padding: 8px; font-size: 0.85rem; }

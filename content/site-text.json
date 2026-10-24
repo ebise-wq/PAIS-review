@@ -3,6 +3,5 @@
   "site.pilotBanner": "Disclaimer: this is an early pilot project. Please do not share publicly yet.",
   "site.footer": "Reviews are written by Claude against a published [method](/methods), then read and published by the editor. They are one considered opinion, not a consensus view, and they can be wrong.\n\nThink a review is wrong? Say so in the comments under it — that is where it gets argued out.\n\nHave something to say about the method or the system as a whole? Write a comment under [method](/methods).",
   "review.provenance": "Read and published by the editor.",
-  "label.topic": "Topic",
   "methods.promptSummary": "The prompt"
 }

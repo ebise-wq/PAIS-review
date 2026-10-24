@@ -89,6 +89,9 @@ rather than just parroting.
 Make sure you have access to the whole paper, and ideally also graphs. Plus supplementary files
 when needed.
 
+For a paper or preprint: if you cannot open the full text, stop and ask for it (a PDF or a
+link) instead of writing the review. Never review a paper from its abstract alone.
+
 ## Grading
 
 For `kind: paper`, grade out of 10, in steps of 0.5. The grade is about how much the paper's evidence can carry
@@ -242,9 +245,10 @@ hyphenated. For example `2024-lidocaine-hpbcd-post-covid.md`.
 2. Run `npm run build` to confirm the frontmatter parses, the grade line matches the score,
    and the site still builds.
 3. Show the user the verdict, score, strengths and weaknesses before committing.
-4. Fill in `access` (fullText, figures, supplement: true or false) and `sources` from what
-   you actually opened in this session: every file you were given and every link you fetched.
-   Not what exists, and not what you remember about the paper.
+4. Fill in `read` from what you actually opened in this session, one line per thing, saying
+   what it was and how you read it: the full text and where it came from, which figures you
+   saw as images and which only from captions, which supplementary files, and every link you
+   fetched. Not what exists, and not what you remember about the paper.
 5. Save it as a draft: add `draft: true` to the frontmatter. Commit and push only when the
    user says so. A draft is not on the site; the user reads it in the site design at
    `/admin/preview/<filename without .md>` and publishes it from the top of that page, which

@@ -11,3 +11,5 @@ Be very careful with received wisdom/common knowledge like "ME/CFS involves x", 
 Be careful with parroting online comments on research - evaluate the comment in its context rather than just parroting.
 
 Make sure you have access to the whole paper, and ideally also graphs. Plus supplementary files when needed.
+
+For a paper or preprint: if you cannot open the full text, stop and ask for it (a PDF or a link) instead of writing the review. Never review a paper from its abstract alone.
