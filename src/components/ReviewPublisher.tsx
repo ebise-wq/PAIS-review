@@ -214,11 +214,11 @@ export function ReviewPublisher({ onExpired }: { onExpired: () => void }) {
             </p>
           )}
 
-          {!parsed.review.access && (
+          {!parsed.review.read?.length && !parsed.review.access && (
             <p className="hint warn">
-              The review does not say what the model read. Add <code>access</code> to the
-              frontmatter (full text, figures, supplement: yes or no); without it the review page
-              says &ldquo;Model read: not recorded&rdquo;.
+              The review does not say what the model read. Add a <code>read</code> list to the
+              frontmatter, one line per thing it opened; without it the review page says
+              &ldquo;What Claude read — not recorded&rdquo;.
             </p>
           )}
 

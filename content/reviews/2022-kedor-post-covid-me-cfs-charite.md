@@ -12,12 +12,11 @@ reviewedOn: 2026-10-19
 guideVersion: "0.8.1"
 model: "claude-opus-5-5"
 effort: "high"
-access:
-  fullText: true
-  figures: false
-  supplement: true
-sources:
-  - "Fig. 3 (grip strength) and Fig. 5 (correlation matrix) viewed as images; Figs 1, 2 and 4 read from captions and source data only"
+read:
+  - "Full text"
+  - "Fig. 3 (grip strength) and Fig. 5 (correlation matrix), viewed as images"
+  - "Figs 1, 2 and 4, from captions and source data only"
+  - "Supplementary information"
   - "Peer review file (Supplementary Information 2)"
   - "Source data spreadsheet, used for the women-only reanalysis of Fig. 5"
   - "https://doi.org/10.1038/s41467-022-33784-x"

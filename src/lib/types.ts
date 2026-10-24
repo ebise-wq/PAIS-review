@@ -71,6 +71,12 @@ export function accessSummary(access: Access): string {
   return out.charAt(0).toUpperCase() + out.slice(1);
 }
 
+/** What the model read, as one list, whether the review records it the current way or the old one. */
+export function readList(review: Pick<ReviewFrontmatter, 'read' | 'access' | 'sources'>): string[] {
+  if (review.read?.length) return review.read;
+  return [...(review.access ? [accessSummary(review.access)] : []), ...(review.sources ?? [])];
+}
+
 /** The coarse ordinal used for preliminary findings. */
 export type Signal = 'promising' | 'mixed' | 'unconvincing' | 'too-early';
 
@@ -139,11 +145,15 @@ export interface ReviewFrontmatter {
    */
   effort?: string;
   /**
-   * What the model actually opened while writing — not what exists. A review written from
-   * the abstract alone reads the same as one written from the full paper; this says which.
+   * Everything the model actually opened while writing, one line each, saying what it was
+   * and how it was read: "Full text, from the publisher's PDF", "Figures 3 and 5, viewed as
+   * images", a link. Not what exists. A review written from the abstract alone reads the
+   * same as one written from the full paper; this is how a reader tells them apart.
    */
+  read?: string[];
+  /** Older reviews: fixed yes/no fields, replaced by `read`. Still shown where present. */
   access?: Access;
-  /** Everything else the model consulted: links, or short descriptions of files it was given. */
+  /** Older reviews: everything else the model consulted, alongside `access`. */
   sources?: string[];
   /** How much the editor changed the model's text. Absent on reviews published before it was recorded. */
   humanInput?: HumanInput;

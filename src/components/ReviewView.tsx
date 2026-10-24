@@ -1,7 +1,7 @@
 import type { ReactNode } from 'react';
 import Link from 'next/link';
 import { paperLink } from '@/lib/reviews';
-import { HUMAN_INPUT_LABELS, KIND_LABELS, accessSummary, modelLabel, type Review } from '@/lib/types';
+import { HUMAN_INPUT_LABELS, KIND_LABELS, modelLabel, readList, type Review } from '@/lib/types';
 import { extractToc } from '@/lib/toc';
 import { displayOrder } from '@/lib/hoist';
 import { TableOfContents } from '@/components/TableOfContents';
@@ -26,6 +26,7 @@ import { conditionTag, tagsOf } from '@/lib/tags';
 export function ReviewView({ review, banner }: { review: Review; banner?: ReactNode }) {
   const text = getSiteText();
   const tagList = getTags();
+  const read = readList(review);
   const own = tagsOf(review, tagList);
   const conditions = (review.conditions ?? []).map((name) => ({ name, tag: conditionTag(name, tagList) }));
   const link = paperLink(review);
@@ -245,21 +246,17 @@ export function ReviewView({ review, banner }: { review: Review; banner?: ReactN
         {/* Kept out of the header: there for anyone checking the review, not needed to read it. */}
         <details className="sources-details">
           <summary>
-            {text['label.access']} — {review.access ? accessSummary(review.access) : text['access.unrecorded']}
+            {text['label.access']}
+            {read.length ? ` (${read.length})` : ` — ${text['access.unrecorded']}`}
           </summary>
-          {review.sources && review.sources.length > 0 ? (
-            <>
-              <p>{text['review.sourcesHeading']}:</p>
-              <ul>
-                {review.sources.map((source) => (
-                  <li key={source}>
-                    <RichText text={/^https?:\/\/\S+$/.test(source) ? `<${source}>` : source} inline />
-                  </li>
-                ))}
-              </ul>
-            </>
-          ) : (
-            <p>{text['review.noSources']}</p>
+          {read.length > 0 && (
+            <ul>
+              {read.map((item) => (
+                <li key={item}>
+                  <RichText text={/^https?:\/\/\S+$/.test(item) ? `<${item}>` : item} inline />
+                </li>
+              ))}
+            </ul>
           )}
         </details>
       </aside>
