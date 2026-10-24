@@ -889,3 +889,5 @@ button.secondary:disabled { opacity: 0.45; cursor: not-allowed; }
 /* Review sections after the body, reached from the contents list, land clear of the sticky bar. */
 #further-context, #notes-for-the-guide, #what-claude-read { scroll-margin-top: 72px; }
 @media (min-width: 1020px) { #further-context, #notes-for-the-guide, #what-claude-read { scroll-margin-top: 20px; } }
+.comment-form-note { margin: -2px 0 8px; font-size: 0.8rem; color: var(--muted); }
+.comment-form-note.over { color: var(--fatal-fg); }
