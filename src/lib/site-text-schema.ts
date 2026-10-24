@@ -133,12 +133,6 @@ export const FIELDS = {
 
   // ---- readers
   'rating.label': line('Rating prompt', 'Next to the stars under each review.', 'Rate this review', 60),
-  'comments.intro': md(
-    'Comments introduction',
-    'Above the comment box, under reviews and under the guide.',
-    'Think the review is wrong, or missed something? Say so here. Votes are open to anyone; each comment shows which version of the method it was written against.',
-    { max: 500 },
-  ),
   'discuss.label': line('Discuss with AI label', 'Before the Claude and ChatGPT buttons under each review.', 'Discuss this review with an AI', 60),
   'discuss.prompt': text(
     'Discuss with AI instruction',
@@ -173,7 +167,7 @@ export const GROUPS: { title: string; open: boolean; keys: SiteTextKey[] }[] = [
   { title: 'Review page', open: false, keys: ['review.weaknessesHeading', 'review.strengthsHeading', 'review.contextHeading', 'review.contextNote', 'review.guideNotesHeading', 'review.guideNotesIntro', 'review.provenance'] },
   { title: 'Review page: detail labels', open: false, keys: ['label.type', 'label.confidence', 'label.importance', 'label.reviewed', 'label.writtenBy', 'label.guideVersion', 'label.humanInput', 'label.access', 'label.preprint', 'access.unrecorded', 'review.detailsSummary'] },
   { title: 'Human input levels', open: false, keys: ['humanInput.none', 'humanInput.minor', 'humanInput.moderate', 'humanInput.major', 'humanInput.unrecorded'] },
-  { title: 'Ratings, comments and AI discussion', open: false, keys: ['rating.label', 'comments.intro', 'discuss.label', 'discuss.prompt'] },
+  { title: 'Ratings, comments and AI discussion', open: false, keys: ['rating.label', 'discuss.label', 'discuss.prompt'] },
   { title: 'Methods and About', open: false, keys: ['methods.promptSummary', 'methods.description', 'about.description'] },
 ];
 
