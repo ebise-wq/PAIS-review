@@ -76,9 +76,9 @@ export function statedGrade(summary: string, signals: readonly string[]): Stated
   if (/^grade\s*:/i.test(plain)) {
     const match = /^grade\s*:\s*(\d+(?:\.\d+)?)\s*(?:\/|out of)\s*10\s*\.?$/i.exec(plain);
     const score = match ? Number(match[1]) : NaN;
-    if (!Number.isFinite(score) || score < 0 || score > 10 || (score * 2) % 1 !== 0) {
+    if (!Number.isFinite(score) || score < 1 || score > 10 || (score * 2) % 1 !== 0) {
       throw new Error(
-        `The executive summary's last line reads "${lastLine}". Write it as "Grade: 6.5 / 10." — 0 to 10, in steps of 0.5.`,
+        `The executive summary's last line reads "${lastLine}". Write it as "Grade: 6.5 / 10." — 1 to 10, in steps of 0.5.`,
       );
     }
     return { score };

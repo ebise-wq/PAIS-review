@@ -3,6 +3,8 @@ import { notFound } from 'next/navigation';
 import { getDoc, renderTemplate } from '@/lib/doc';
 import { site } from '@/lib/site';
 import { Markdown } from '@/components/Markdown';
+import { GradeScheme } from '@/components/GradeScheme';
+import { getGradeScheme } from '@/lib/grades-store';
 import { Comments } from '@/components/Comments';
 import { getSiteText } from '@/lib/site-text';
 import { dbConfigured } from '@/lib/db';
@@ -35,11 +37,13 @@ export default function MethodsPage() {
   const methodsBody = renderTemplate(methods.body, site.url);
   const { main: guideBody, changelog } = splitChangelog(guide.body);
   const hasComments = dbConfigured();
+  const grades = getGradeScheme();
 
   // The same contents list as a review page, built from everything on this page in order.
   const toc: TocEntry[] = [
     ...extractToc(methodsBody),
     ...(prompt ? [{ id: 'prompt', text: text['methods.promptSummary'] }] : []),
+    ...(grades.length ? [{ id: 'grade-scheme', text: text['methods.gradesSummary'] }] : []),
     ...extractToc(guideBody),
     ...(changelog ? [{ id: 'changelog', text: 'Changelog' }] : []),
     ...(hasComments ? [{ id: 'comments', text: 'Comments' }] : []),
@@ -77,6 +81,13 @@ export default function MethodsPage() {
             Raw files: <a href="/prompt.md">/prompt.md</a>, <a href="/instructions.md">/instructions.md</a>,{' '}
             <a href="/guide.md">/guide.md</a>.
           </p>
+        </details>
+      )}
+
+      {grades.length > 0 && (
+        <details className="prompt-details" id="grade-scheme">
+          <summary>{text['methods.gradesSummary']}</summary>
+          <GradeScheme bands={grades} />
         </details>
       )}
 

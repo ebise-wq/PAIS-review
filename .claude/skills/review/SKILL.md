@@ -51,7 +51,7 @@ justification for them. So:
 - `paper` — one study. Takes `score`. A preprint is a paper: add `preprint: true` and grade it
   on the same scale.
 - `literature` — a body of work, several papers, a field. Takes **no score and no signal**; the
-  verdict sentence carries it. "How good is this body of evidence" is not the question the 0–10
+  verdict sentence carries it. "How good is this body of evidence" is not the question the 1–10
   scale was built to answer, and forcing a number on it invents precision.
 - `preliminary` — unpublished data, a conference abstract, a company announcement. Not a
   preprint. Takes `signal`: one of `promising`, `mixed`, `unconvincing`, `too-early`.
@@ -104,7 +104,7 @@ its own claims, not about how interesting the topic is or how much you like the 
 - **5–6.4** — Borderline. Real contribution, real limits; the main claim is weaker than stated.
 - **3–4.9** — Does not pass. The design cannot separate the claimed effect from bias, placebo,
   regression to the mean or natural history.
-- **0–2.9** — Fatally flawed. The data contradict the claim, or the method cannot produce the
+- **1–2.9** — Fatally flawed. The data contradict the claim, or the method cannot produce the
   stated result at all.
 
 **Grade holistically.** Weigh the paper as a whole: how far its evidence carries its main

@@ -28,6 +28,9 @@ in /admin → Backlog. Longer write-ups live in `docs/roadmap.md`. Not shown on 
 - [ ] [medium] Weekly email digest that readers sign up for, with filters (condition, tag, type of review, score band). Needs the site to send email.
 - [ ] [medium] Request a review: paste a DOI or link; the site checks whether a review already exists and whether the full text is openly available, and asks for a PDF if not. Requests go in a public queue others can upvote; needs an account; the requester is emailed when the review is up. Reviews written by a scheduled Claude Code session, rate-limited, saved as drafts for the editor. See the roadmap.
 - [ ] [medium] Accounts by email with one-time codes: required to comment, vote and request reviews. Needs a domain of our own and an email-sending service first.
+- [ ] [medium] Commenters give an email address with their username, never shown publicly, so a username belongs to one email and can later be verified (one-time code, then the verified-scientist badge). Needs a short privacy note and the addresses kept out of public pages, the API and the comments markdown.
+- [ ] [medium] A sign-up on the About page for updates about the project. Can store addresses now; sending needs an email service.
+- [ ] [low] A contact form, once the site has its own domain.
 - [x] [medium] Tags on reviews (treatment trial, diagnostic test, genetics…), from one controlled list, with filters on the index and a page per tag. (done 2026-10-23)
 - [x] [medium] Preview links for site changes: move the live site to the main branch. First ask Claude to bring main up to date. Then in Vercel: Settings → Environments → Production → Branch Tracking → main; Settings → Environment Variables → GITHUB_BRANCH → main; then redeploy once. (done 2026-10-18)
 - [ ] [low] A "report an error" link on each review.

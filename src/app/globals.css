@@ -759,7 +759,7 @@ button.secondary:disabled { opacity: 0.45; cursor: not-allowed; }
 .backlog-date { text-decoration: none; font-size: 0.78rem; }
 
 /* Methods page: anchors that are not markdown headings land clear of the sticky contents bar. */
-#prompt, #guide, #changelog, #comments { scroll-margin-top: 72px; }
+#prompt, #grade-scheme, #guide, #changelog, #comments { scroll-margin-top: 72px; }
 .changelog-details { margin-top: 28px; }
 .changelog-details .prose { margin-top: 10px; }
 
@@ -891,3 +891,30 @@ button.secondary:disabled { opacity: 0.45; cursor: not-allowed; }
 @media (min-width: 1020px) { #further-context, #notes-for-the-guide, #what-claude-read { scroll-margin-top: 20px; } }
 .comment-form-note { margin: -2px 0 8px; font-size: 0.8rem; color: var(--muted); }
 .comment-form-note.over { color: var(--fatal-fg); }
+.card-comments { color: inherit; text-decoration: underline; text-decoration-color: var(--border-strong); text-underline-offset: 2px; }
+.card-comments:hover { color: var(--text); }
+
+/* ---------- grade scheme: Methods fold and the pop-up a link to it opens ---------- */
+.grade-scheme { list-style: none; margin: 12px 0 0; padding: 0; }
+.grade-scheme li { display: grid; grid-template-columns: 9.5rem 1fr; gap: 12px; align-items: start; padding: 9px 0; border-top: 1px solid var(--border); font-size: 0.9rem; line-height: 1.45; }
+.grade-scheme li:first-child { border-top: 0; }
+.grade-band { justify-self: start; display: inline-block; padding: 3px 9px; border-radius: 8px; border: 1px solid var(--border); font-size: 0.82rem; white-space: nowrap; }
+.grade-band[data-tone='strong'] { background: var(--strong-bg); border-color: var(--strong-br); color: var(--strong-fg); }
+.grade-band[data-tone='solid'] { background: var(--solid-bg); border-color: var(--solid-br); color: var(--solid-fg); }
+.grade-band[data-tone='borderline'] { background: var(--borderline-bg); border-color: var(--borderline-br); color: var(--borderline-fg); }
+.grade-band[data-tone='weak'] { background: var(--weak-bg); border-color: var(--weak-br); color: var(--weak-fg); }
+.grade-band[data-tone='fatal'] { background: var(--fatal-bg); border-color: var(--fatal-br); color: var(--fatal-fg); }
+@media (max-width: 520px) { .grade-scheme li { grid-template-columns: 1fr; gap: 6px; } }
+
+.grade-dialog {
+  width: min(34rem, calc(100vw - 32px)); max-height: calc(100vh - 48px); overflow-y: auto;
+  padding: 16px 18px 12px; border: 1px solid var(--border-strong); border-radius: 12px;
+  background: var(--surface); color: var(--text); box-shadow: 0 16px 48px rgb(0 0 0 / 0.35);
+}
+.grade-dialog::backdrop { background: rgb(0 0 0 / 0.5); }
+.grade-dialog-head { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+.grade-dialog-head h2 { margin: 0; font-size: 1.05rem; }
+.icon-close { flex: none; width: 36px; height: 36px; border-radius: 8px; border: 1px solid var(--border); background: var(--surface-2); color: var(--text); font-size: 1.2rem; line-height: 1; cursor: pointer; }
+
+/* A link that opens the grade scheme reads as an explanation, not as a page to go to. */
+a[href$='#grade-scheme'] { text-decoration-style: dotted; text-underline-offset: 3px; cursor: help; }

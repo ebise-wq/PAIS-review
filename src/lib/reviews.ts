@@ -36,8 +36,8 @@ function coerce(data: Record<string, unknown>, slug: string, body: string): Revi
   let score: number | undefined;
   if (kind === 'paper') {
     const parsedScore = typeof data.score === 'number' ? data.score : Number(data.score);
-    if (!Number.isFinite(parsedScore) || parsedScore < 0 || parsedScore > 10) {
-      throw new Error(`${slug}: "score" must be a number from 0 to 10, got ${String(data.score)}`);
+    if (!Number.isFinite(parsedScore) || parsedScore < 1 || parsedScore > 10) {
+      throw new Error(`${slug}: "score" must be a number from 1 to 10, got ${String(data.score)}`);
     }
     score = parsedScore;
   }

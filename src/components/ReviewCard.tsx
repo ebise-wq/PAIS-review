@@ -47,11 +47,20 @@ export function ReviewCard({
                 </span>
               </span>
             )}
-            <span>
-              {engagement.comments === 0
-                ? 'No comments'
-                : `${engagement.comments} comment${engagement.comments === 1 ? '' : 's'}`}
-            </span>
+            {/* The count goes straight to the thread; the preview in admin has no page to go to. */}
+            {(() => {
+              const label =
+                engagement.comments === 0
+                  ? 'No comments'
+                  : `${engagement.comments} comment${engagement.comments === 1 ? '' : 's'}`;
+              return href ? (
+                <Link className="card-comments" href={`${href}#comments`}>
+                  {label}
+                </Link>
+              ) : (
+                <span>{label}</span>
+              );
+            })()}
             {engagement.lastCommentAt && (
               <span title={`Latest comment ${timeAgo(engagement.lastCommentAt, now)}`}>
                 {timeAgo(engagement.lastCommentAt, now)}

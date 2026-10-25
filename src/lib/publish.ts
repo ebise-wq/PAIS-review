@@ -173,11 +173,11 @@ export function buildReviewFile(
   if (kind === 'paper') {
     if (data.signal != null) throw new Error('A paper review takes "score", not "signal".');
     const parsedScore = typeof data.score === 'number' ? data.score : Number(data.score);
-    if (!Number.isFinite(parsedScore) || parsedScore < 0 || parsedScore > 10) {
+    if (!Number.isFinite(parsedScore) || parsedScore < 1 || parsedScore > 10) {
       throw new Error(
         data.score == null
           ? 'No grade found. End the executive summary with "Grade: 6.5 / 10." (or set score in the frontmatter).'
-          : `"score" must be a number from 0 to 10, got ${String(data.score)}.`,
+          : `"score" must be a number from 1 to 10, got ${String(data.score)}.`,
       );
     }
     score = parsedScore;

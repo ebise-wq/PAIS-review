@@ -4,6 +4,8 @@ import { site } from '@/lib/site';
 import { getSiteText } from '@/lib/site-text';
 import { ThemeToggle } from '@/components/ThemeToggle';
 import { RichText } from '@/components/RichText';
+import { GradeSchemeDialog } from '@/components/GradeSchemeDialog';
+import { getGradeScheme } from '@/lib/grades-store';
 import './globals.css';
 
 export function generateMetadata(): Metadata {
@@ -60,6 +62,8 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         )}
 
         <main className="wrap">{children}</main>
+
+        <GradeSchemeDialog bands={getGradeScheme()} title={text['methods.gradesSummary']} />
 
         <footer className="site-footer">
           <div className="wrap">

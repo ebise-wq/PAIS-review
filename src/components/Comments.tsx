@@ -1,10 +1,18 @@
 'use client';
 
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import type { CommentNode, TargetType } from '@/lib/comments';
 import { timeAgo } from '@/lib/time';
 
 const USERNAME_KEY = 'pais_username';
+
+export const COUNT_EVENT = 'pais:comment-count';
+export interface CommentCount {
+  type: TargetType;
+  slug: string;
+  count: number;
+  configured: boolean;
+}
 // Matches LIMITS.bodyMax in lib/comments.ts, which the server enforces.
 const BODY_LIMIT = 4000;
 
@@ -86,6 +94,24 @@ export function Comments({
       setData({ configured: true, admin: false, comments: [], version: null, error: 'Comments could not be loaded.' });
     }
   }, [type, slug]);
+
+  // Tell the link at the top of the review how many there are, without a second request.
+  useEffect(() => {
+    if (!data) return;
+    const detail: CommentCount = { type, slug, count: countVisible(data.comments), configured: data.configured };
+    window.dispatchEvent(new CustomEvent(COUNT_EVENT, { detail }));
+  }, [data, type, slug]);
+
+  // A link to "#comments" from another page arrives before the thread has loaded, so the
+  // browser finds nothing to scroll to. Once it is there, finish the jump, once.
+  const arrived = useRef(false);
+  useEffect(() => {
+    if (!data || arrived.current) return;
+    arrived.current = true;
+    if (window.location.hash === '#comments') {
+      requestAnimationFrame(() => document.getElementById('comments')?.scrollIntoView());
+    }
+  }, [data]);
 
   useEffect(() => {
     load();

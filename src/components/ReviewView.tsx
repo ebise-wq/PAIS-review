@@ -9,6 +9,7 @@ import { Authors } from '@/components/Authors';
 import { DiscussWithAI } from '@/components/DiscussWithAI';
 import { Rating } from '@/components/Rating';
 import { Comments } from '@/components/Comments';
+import { CommentsLink } from '@/components/CommentsLink';
 import { ScoreBadge } from '@/components/ScoreBadge';
 import { Markdown } from '@/components/Markdown';
 import { site } from '@/lib/site';
@@ -76,6 +77,7 @@ export function ReviewView({ review, banner }: { review: Review; banner?: ReactN
               </a>
             </>
           )}
+          {!banner && <CommentsLink type="review" slug={review.slug} />}
         </p>
 
         <div className="verdict-box">
