@@ -918,3 +918,23 @@ button.secondary:disabled { opacity: 0.45; cursor: not-allowed; }
 
 /* A link that opens the grade scheme reads as an explanation, not as a page to go to. */
 a[href$='#grade-scheme'] { text-decoration-style: dotted; text-underline-offset: 3px; cursor: help; }
+
+/* Comment flags, retraction, and the per-comment actions menu. */
+.comment-flag { font-size: 0.72rem; padding: 1px 7px; border-radius: 999px; border: 1px solid var(--border); color: var(--muted); }
+.comment-flag.resolved { background: var(--strong-bg); border-color: var(--strong-br); color: var(--strong-fg); }
+.comment-body.retracted p { text-decoration: line-through; color: var(--muted); }
+.comment-more { position: relative; }
+.comment-more > summary {
+  list-style: none; cursor: pointer; padding: 0 8px; border-radius: 6px; color: var(--muted); font-size: 1.1rem; line-height: 1.4;
+}
+.comment-more > summary::-webkit-details-marker { display: none; }
+.comment-more > summary:hover { color: var(--text); background: var(--surface-2); }
+.comment-more-list {
+  position: absolute; right: 0; top: calc(100% + 4px); z-index: 10; min-width: 11rem;
+  display: flex; flex-direction: column; align-items: stretch; padding: 4px;
+  background: var(--surface); border: 1px solid var(--border-strong); border-radius: 10px;
+  box-shadow: 0 8px 24px rgb(0 0 0 / 0.25);
+}
+.comment-more-list .linkish { text-align: left; padding: 9px 10px; border-radius: 6px; font-size: 0.88rem; }
+.comment-more-list .linkish:hover { background: var(--surface-2); }
+.comment-form.edit { margin: 8px 0 10px; }

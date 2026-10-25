@@ -97,6 +97,19 @@ begin
   end if;
 end $$;
 
+-- Added later: edits, retractions and resolution. Each runs once; later starts skip it.
+alter table comments add column if not exists edited_at timestamptz;
+alter table comments add column if not exists retracted_at timestamptz;
+alter table comments add column if not exists resolved_at timestamptz;
+
+-- Every earlier text of an edited comment, so an edit cannot quietly rewrite history.
+create table if not exists comment_edits (
+  id         bigserial primary key,
+  comment_id bigint not null references comments(id) on delete cascade,
+  body       text not null,
+  edited_at  timestamptz not null default now()
+);
+
 create table if not exists ratings (
   review_slug text not null,
   voter       text not null,

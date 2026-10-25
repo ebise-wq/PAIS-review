@@ -1,6 +1,17 @@
 import { NextResponse } from 'next/server';
 import { dbConfigured, describeDbError } from '@/lib/db';
-import { createComment, isRateLimited, listComments, validateComment, type TargetType } from '@/lib/comments';
+import {
+  commentAuthor,
+  createComment,
+  editComment,
+  isRateLimited,
+  listComments,
+  setResolved,
+  setRetracted,
+  validateBody,
+  validateComment,
+  type TargetType,
+} from '@/lib/comments';
 import { getDoc } from '@/lib/doc';
 import { getReview } from '@/lib/reviews';
 import { isSignedIn } from '@/lib/session';
@@ -88,5 +99,55 @@ export async function POST(request: Request) {
     return response;
   } catch (error) {
     return fail(error instanceof Error ? error.message : 'Could not post the comment.', 400);
+  }
+}
+
+/**
+ * Changes to an existing comment. Without accounts, the author is whoever holds the
+ * browser token it was posted with: only they can edit or retract it. Resolving is open
+ * to the author and the editor.
+ */
+export async function PATCH(request: Request) {
+  if (!dbConfigured()) return fail('Comments are not set up on this site yet.', 503);
+
+  let input: { id?: number; action?: string; body?: string };
+  try {
+    input = await request.json();
+  } catch {
+    return fail('Could not read the request.', 400);
+  }
+
+  const id = Number(input.id);
+  if (!Number.isInteger(id) || id <= 0) return fail('Bad comment.', 400);
+  const author = await commentAuthor(id);
+  if (!author) return fail('That comment is gone.', 404);
+
+  const voter = readVoter(request);
+  const own = voter !== null && voter === author.voter;
+  const admin = await isSignedIn();
+  if (author.hidden && !admin) return fail('That comment is hidden.', 403);
+  const notYours = 'Only the person who wrote this comment can do that, from the browser they wrote it in.';
+
+  switch (input.action) {
+    case 'edit': {
+      if (!own) return fail(notYours, 403);
+      const body = String(input.body ?? '');
+      const problem = validateBody(body);
+      if (problem) return fail(problem, 400);
+      const changed = await editComment(id, body);
+      return NextResponse.json({ ok: true, changed });
+    }
+    case 'retract':
+    case 'unretract':
+      if (!own) return fail(notYours, 403);
+      await setRetracted(id, input.action === 'retract');
+      return NextResponse.json({ ok: true });
+    case 'resolve':
+    case 'unresolve':
+      if (!own && !admin) return fail('Only the person who wrote this comment, or the editor, can do that.', 403);
+      await setResolved(id, input.action === 'resolve');
+      return NextResponse.json({ ok: true });
+    default:
+      return fail('Unknown action.', 400);
   }
 }
