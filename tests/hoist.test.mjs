@@ -56,7 +56,8 @@ test('grade absent: nothing stated, frontmatter is left to decide', () => {
 test('malformed grade: throws rather than falling back', () => {
   assert.throws(() => statedGrade('## Executive summary\n\nGrade: three', SIGNALS), /Grade: 6.5 \/ 10/);
   assert.throws(() => statedGrade('## Executive summary\n\nGrade: 6.3 / 10.', SIGNALS), /steps of 0.5/);
-  assert.throws(() => statedGrade('## Executive summary\n\nGrade: 11 / 10.', SIGNALS), /0 to 10/);
+  assert.throws(() => statedGrade('## Executive summary\n\nGrade: 11 / 10.', SIGNALS), /1 to 10/);
+  assert.throws(() => statedGrade('## Executive summary\n\nGrade: 0 / 10.', SIGNALS), /1 to 10/);
   assert.throws(() => statedGrade('## Executive summary\n\nSignal: great.', SIGNALS), /must be one of/);
 });
 

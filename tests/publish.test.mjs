@@ -7,10 +7,11 @@ const file = (frontmatter, body = '## Study design\n\nText.\n') =>
   `---\ntitle: "A study of something"\nverdict: "One line."\nreviewedOn: 2026-10-14\n${frontmatter}\n---\n\n${body}`;
 const fails = (fn, pattern) => assert.throws(fn, pattern);
 
-test('a paper needs a score from 0 to 10', () => {
+test('a paper needs a score from 1 to 10', () => {
   assert.equal(buildReviewFile(file('kind: paper\nscore: 6.5')).review.score, 6.5);
   fails(() => buildReviewFile(file('kind: paper')), /No grade found/);
-  fails(() => buildReviewFile(file('kind: paper\nscore: 11')), /0 to 10/);
+  fails(() => buildReviewFile(file('kind: paper\nscore: 11')), /1 to 10/);
+  fails(() => buildReviewFile(file('kind: paper\nscore: 0.5')), /1 to 10/);
 });
 
 test('literature reviews take no grade; preliminary findings take a signal', () => {

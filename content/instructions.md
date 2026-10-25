@@ -124,11 +124,11 @@ introducing technical language there.
 
 ### kind, and what grades it takes
 
-- **`kind: paper`** — a review of one study. Takes `score`, 0–10 in steps of 0.5. A preprint
+- **`kind: paper`** — a review of one study. Takes `score`, 1–10 in steps of 0.5. A preprint
   is a paper: set `preprint: true` and grade it on the same scale.
 - **`kind: literature`** — a review of a body of work, several papers, or a field. Takes **no
   score and no signal**. The verdict carries it. Do not add a number; "how good is this body of
-  evidence" is not the question the 0–10 scale was built to answer.
+  evidence" is not the question the 1–10 scale was built to answer.
 - **`kind: preliminary`** — unpublished data, a conference abstract, a company announcement.
   Not a preprint. Takes `signal`, one of `promising`, `mixed`, `unconvincing`, `too-early`. No
   score: a decimal grade on data that thin is false precision.
@@ -143,7 +143,7 @@ the topic is, and not whether you agree with the conclusion.
 - **5–6.4** — Real contribution, real limits; the main claim is weaker than stated.
 - **3–4.9** — The design cannot separate the claimed effect from bias, placebo, regression to
   the mean or natural history.
-- **0–2.9** — The data contradict the claim, or the method cannot produce the stated result.
+- **1–2.9** — The data contradict the claim, or the method cannot produce the stated result.
 
 **Grade holistically.** Weigh the paper as a whole: how far its evidence carries its main
 claim. Do not score domains and average them, and do not apply a mechanical ceiling. A single

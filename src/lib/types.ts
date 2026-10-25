@@ -3,7 +3,7 @@ export type Importance = 'high' | 'moderate' | 'low';
 
 /**
  * What is being reviewed. This decides how the verdict is expressed:
- * a single paper gets a 0–10 score — a preprint is a paper, marked `preprint: true`;
+ * a single paper gets a 1–10 score — a preprint is a paper, marked `preprint: true`;
  * preliminary findings (abstracts, unpublished data, announcements) get a coarse
  * ordinal, because a decimal grade on that is false precision; a literature review
  * gets neither, because "how good is this body of evidence" is not the same question
@@ -117,7 +117,7 @@ export interface ReviewFrontmatter {
   kind: ReviewKind;
   /** Papers only: not yet peer reviewed. Graded like any other paper, and marked as such. */
   preprint?: boolean;
-  /** 0–10, in 0.5 steps. Papers only. */
+  /** 1–10, in 0.5 steps. Papers only. */
   score?: number;
   /** Coarse ordinal. Preliminary findings only. */
   signal?: Signal;

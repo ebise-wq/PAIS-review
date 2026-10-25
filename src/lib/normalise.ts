@@ -31,7 +31,7 @@ const FrontmatterSchema = z.object({
   score: z
     .number()
     .describe(
-      'Only for kind=paper, 0-10, and ONLY if the source states an explicit overall grade. Use -1 if the source gives no explicit overall grade. Never infer one.',
+      'Only for kind=paper, 1-10, and ONLY if the source states an explicit overall grade. Use -1 if the source gives no explicit overall grade. Never infer one.',
     ),
   signal: z
     .enum(['', ...SIGNALS] as [string, ...string[]])
