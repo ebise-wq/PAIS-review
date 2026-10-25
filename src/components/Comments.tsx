@@ -1,6 +1,6 @@
 'use client';
 
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import type { CommentNode, TargetType } from '@/lib/comments';
 import { timeAgo } from '@/lib/time';
 
@@ -101,6 +101,17 @@ export function Comments({
     const detail: CommentCount = { type, slug, count: countVisible(data.comments), configured: data.configured };
     window.dispatchEvent(new CustomEvent(COUNT_EVENT, { detail }));
   }, [data, type, slug]);
+
+  // A link to "#comments" from another page arrives before the thread has loaded, so the
+  // browser finds nothing to scroll to. Once it is there, finish the jump, once.
+  const arrived = useRef(false);
+  useEffect(() => {
+    if (!data || arrived.current) return;
+    arrived.current = true;
+    if (window.location.hash === '#comments') {
+      requestAnimationFrame(() => document.getElementById('comments')?.scrollIntoView());
+    }
+  }, [data]);
 
   useEffect(() => {
     load();
