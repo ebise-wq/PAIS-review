@@ -138,3 +138,39 @@ test('one rating per reader per review, which they can change; the index sees th
   assert.equal(totals.ratingAverage, 4.5);
   assert.equal(totals.ratingCount, 2);
 });
+
+test('an edit is marked, keeps the earlier text, and saving the same text changes nothing', { skip }, async () => {
+  const target = slug();
+  const id = await post(target, { body: 'First version of the point' });
+  assert.equal(await lib.editComment(id, 'Second version of the point'), true);
+  assert.equal(await lib.editComment(id, 'Second version of the point'), false);
+  const [comment] = await lib.listComments('review', target, 'voter-a');
+  assert.equal(comment.body, 'Second version of the point');
+  assert.ok(comment.editedAt);
+  assert.deepEqual((await lib.commentHistory(id)).map((h) => h.body), ['First version of the point']);
+});
+
+test('only the author’s browser sees a comment as its own', { skip }, async () => {
+  const target = slug();
+  await post(target);
+  assert.equal((await lib.listComments('review', target, 'voter-a'))[0].own, true);
+  assert.equal((await lib.listComments('review', target, 'voter-b'))[0].own, false);
+  assert.equal((await lib.listComments('review', target, null))[0].own, false);
+  assert.equal((await lib.commentAuthor(Number((await lib.listComments('review', target, null))[0].id))).voter, 'voter-a');
+});
+
+test('retracting and resolving can be undone, and the thread markdown says so', { skip }, async () => {
+  const target = slug();
+  const id = await post(target);
+  await lib.setRetracted(id, true);
+  await lib.setResolved(id, true);
+  let [comment] = await lib.listComments('review', target, null);
+  assert.equal(comment.retracted, true);
+  assert.equal(comment.resolved, true);
+  assert.match(lib.renderCommentsMarkdown([comment]), /\[retracted by its author\] \[resolved\]/);
+  await lib.setRetracted(id, false);
+  await lib.setResolved(id, false);
+  [comment] = await lib.listComments('review', target, null);
+  assert.equal(comment.retracted, false);
+  assert.equal(comment.resolved, false);
+});

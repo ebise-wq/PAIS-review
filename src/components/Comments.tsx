@@ -6,6 +6,8 @@ import { timeAgo } from '@/lib/time';
 
 const USERNAME_KEY = 'pais_username';
 
+type ChangeAction = 'edit' | 'retract' | 'unretract' | 'resolve' | 'unresolve';
+
 export const COUNT_EVENT = 'pais:comment-count';
 export interface CommentCount {
   type: TargetType;
@@ -163,6 +165,24 @@ export function Comments({
     load();
   }
 
+  /** Edit, retract or resolve. Returns an error to show, or null once done. */
+  async function change(id: number, action: ChangeAction, body?: string): Promise<string | null> {
+    setError(null);
+    try {
+      const response = await fetch('/api/comments', {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ id, action, body }),
+      });
+      const json = (await response.json().catch(() => ({}))) as { error?: string };
+      if (!response.ok) return json.error ?? 'Could not change that comment.';
+    } catch {
+      return 'Could not reach the server.';
+    }
+    await load();
+    return null;
+  }
+
   function toggleCollapse(commentId: number) {
     setCollapsed((current) => {
       const next = new Set(current);
@@ -205,6 +225,7 @@ export function Comments({
             onReply={setReplyTo}
             onVote={castVote}
             onModerate={moderate}
+            onChange={change}
             form={(parentId) => (
               <CommentForm
                 type={type}
@@ -240,6 +261,7 @@ function CommentItem({
   onReply,
   onVote,
   onModerate,
+  onChange,
   form,
 }: {
   node: CommentNode;
@@ -251,12 +273,19 @@ function CommentItem({
   onReply: (id: number | null) => void;
   onVote: (id: number, axis: 'karma' | 'agree' | 'heart', value: -1 | 0 | 1) => void;
   onModerate: (id: number, action: 'hide' | 'unhide' | 'remove') => void;
+  onChange: (id: number, action: ChangeAction, body?: string) => Promise<string | null>;
   form: (parentId: number) => React.ReactNode;
 }) {
+  const [editing, setEditing] = useState(false);
+  const [problem, setProblem] = useState<string | null>(null);
+  const act = async (action: ChangeAction) => {
+    setProblem(await onChange(node.id, action));
+  };
   const indent = Math.min(depth, MAX_INDENT);
   const toggle = (axis: 'karma' | 'agree', value: 1 | -1) =>
     onVote(node.id, axis, node.mine[axis] === value ? 0 : value);
-  const isCollapsed = collapsed.has(node.id);
+  // A retracted comment starts folded; tapping it open is the same toggle as any other.
+  const isCollapsed = collapsed.has(node.id) !== node.retracted;
   const buried = countVisible(node.replies);
 
   const collapseButton = (
@@ -295,8 +324,15 @@ function CommentItem({
             <span className="comment-user">{node.username}</span>
             {node.version && <span className="comment-version">on v{node.version}</span>}
             <span className="comment-time">{timeAgo(node.createdAt)}</span>
+            {node.editedAt && (
+              <span className="comment-time" title={`Edited ${timeAgo(node.editedAt)}`}>
+                Edited
+              </span>
+            )}
+            {node.retracted && <span className="comment-flag retracted">Retracted</span>}
+            {node.resolved && <span className="comment-flag resolved">Resolved</span>}
             {node.hidden && <span className="comment-version">hidden</span>}
-            {isCollapsed && (
+            {isCollapsed && (buried > 0 || !node.retracted) && (
               <span className="comment-time">
                 {buried > 0 ? `${buried} ${buried === 1 ? 'reply' : 'replies'} hidden` : 'collapsed'}
               </span>
@@ -304,11 +340,24 @@ function CommentItem({
           </div>
           {!isCollapsed && (
           <>
-          <div className="comment-body">
-            {node.body.split(/\n{2,}/).map((para, index) => (
-              <p key={index}>{para}</p>
-            ))}
-          </div>
+          {editing ? (
+            <EditForm
+              id={node.id}
+              initial={node.body}
+              onSave={async (body) => {
+                const failed = await onChange(node.id, 'edit', body);
+                if (!failed) setEditing(false);
+                return failed;
+              }}
+              onCancel={() => setEditing(false)}
+            />
+          ) : (
+            <div className={`comment-body${node.retracted ? ' retracted' : ''}`}>
+              {node.body.split(/\n{2,}/).map((para, index) => (
+                <p key={index}>{para}</p>
+              ))}
+            </div>
+          )}
           <div className="comment-actions">
             <span className="vote-group" title="Is this a good comment?">
               <button type="button" className={`vote${node.mine.karma === 1 ? ' on' : ''}`} onClick={() => toggle('karma', 1)} aria-label="Upvote">▲</button>
@@ -337,17 +386,44 @@ function CommentItem({
             <button type="button" className="linkish" onClick={() => onReply(replyTo === node.id ? null : node.id)}>
               Reply
             </button>
-            {admin && (
-              <button type="button" className="linkish" onClick={() => onModerate(node.id, node.hidden ? 'unhide' : 'hide')}>
-                {node.hidden ? 'Unhide' : 'Hide'}
-              </button>
-            )}
-            {admin && (
-              <button type="button" className="linkish danger" onClick={confirmRemove}>
-                Remove
-              </button>
+            {(node.own || admin) && (
+              <details className="comment-more">
+                <summary aria-label="More actions">⋯</summary>
+                {/* Choosing an action closes the menu. */}
+                <div
+                  className="comment-more-list"
+                  onClick={(event) => {
+                    if ((event.target as Element).closest('button')) event.currentTarget.closest('details')?.removeAttribute('open');
+                  }}
+                >
+                  {node.own && !editing && (
+                    <button type="button" className="linkish" onClick={() => setEditing(true)}>
+                      Edit
+                    </button>
+                  )}
+                  <button type="button" className="linkish" onClick={() => act(node.resolved ? 'unresolve' : 'resolve')}>
+                    {node.resolved ? 'Mark unresolved' : 'Mark resolved'}
+                  </button>
+                  {node.own && (
+                    <button type="button" className="linkish" onClick={() => act(node.retracted ? 'unretract' : 'retract')}>
+                      {node.retracted ? 'Undo retract' : 'Retract'}
+                    </button>
+                  )}
+                  {admin && (
+                    <button type="button" className="linkish" onClick={() => onModerate(node.id, node.hidden ? 'unhide' : 'hide')}>
+                      {node.hidden ? 'Unhide' : 'Hide'}
+                    </button>
+                  )}
+                  {admin && (
+                    <button type="button" className="linkish danger" onClick={confirmRemove}>
+                      Remove
+                    </button>
+                  )}
+                </div>
+              </details>
             )}
           </div>
+          {problem && <div className="notice err">{problem}</div>}
           </>
           )}
         </>
@@ -369,6 +445,7 @@ function CommentItem({
               onReply={onReply}
               onVote={onVote}
               onModerate={onModerate}
+              onChange={onChange}
               form={form}
             />
           ))}
@@ -498,6 +575,70 @@ function CommentForm({
             Cancel
           </button>
         )}
+      </div>
+      {error && <div className="notice err">{error}</div>}
+    </form>
+  );
+}
+
+/** Editing a posted comment. Kept on the device as a draft too, like a new comment. */
+function EditForm({
+  id,
+  initial,
+  onSave,
+  onCancel,
+}: {
+  id: number;
+  initial: string;
+  onSave: (body: string) => Promise<string | null>;
+  onCancel: () => void;
+}) {
+  const key = `pais_draft:edit:${id}`;
+  const [body, setBody] = useState(initial);
+  const [busy, setBusy] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    const saved = readDraft(key);
+    if (saved) setBody(saved);
+  }, [key]);
+
+  const change = (value: string) => {
+    setBody(value);
+    writeDraft(key, value === initial ? '' : value);
+  };
+
+  async function save(event: React.FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    setBusy(true);
+    const failed = await onSave(body);
+    setBusy(false);
+    if (failed) setError(failed);
+    else writeDraft(key, '');
+  }
+
+  return (
+    <form className="comment-form edit" onSubmit={save}>
+      <textarea aria-label="Edit comment" rows={5} value={body} onChange={(event) => change(event.target.value)} required />
+      {body.length > BODY_LIMIT * 0.9 && (
+        <p className={`comment-form-note${body.length > BODY_LIMIT ? ' over' : ''}`}>
+          {body.length.toLocaleString('en-GB')} / {BODY_LIMIT.toLocaleString('en-GB')} characters
+        </p>
+      )}
+      <div className="comment-form-row">
+        <button className="primary" type="submit" disabled={busy || body.length > BODY_LIMIT || body.trim() === initial.trim()}>
+          {busy ? 'Saving…' : 'Save'}
+        </button>
+        <button
+          type="button"
+          className="linkish"
+          onClick={() => {
+            writeDraft(key, '');
+            onCancel();
+          }}
+        >
+          Cancel
+        </button>
       </div>
       {error && <div className="notice err">{error}</div>}
     </form>
