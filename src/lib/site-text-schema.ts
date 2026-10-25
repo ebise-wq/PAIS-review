@@ -60,7 +60,7 @@ export const FIELDS = {
   'home.intro': md(
     'Introduction',
     'Paragraph under the heading on the home page.',
-    'Each paper is reviewed against a published guide, graded out of 10, and summarised by its main strengths and weaknesses. Scores are a judgement, not a measurement — read the review.',
+    'Each paper is reviewed against a published guide, [graded out of 10](/methods#grade-scheme), and summarised by its main strengths and weaknesses. Scores are a judgement, not a measurement — read the review.',
     { max: 600 },
   ),
   'home.searchPlaceholder': line('Search box placeholder', 'Grey text inside the empty search box.', 'Search reviews', 40),
@@ -142,6 +142,7 @@ export const FIELDS = {
   ),
 
   // ---- methods and about
+  'methods.gradesSummary': line('Grade scheme heading', 'Fold on the Methods page, and title of the pop-up a link to /methods#grade-scheme opens.', 'Grade scheme', 60),
   'methods.promptSummary': line('Prompt expander', 'The fold-out on the Methods page that shows the prompt.', 'The prompt, word for word', 60),
   'methods.description': text(
     'Methods page description',
@@ -168,7 +169,7 @@ export const GROUPS: { title: string; open: boolean; keys: SiteTextKey[] }[] = [
   { title: 'Review page: detail labels', open: false, keys: ['label.type', 'label.confidence', 'label.importance', 'label.reviewed', 'label.writtenBy', 'label.guideVersion', 'label.humanInput', 'label.access', 'label.preprint', 'access.unrecorded', 'review.detailsSummary'] },
   { title: 'Human input levels', open: false, keys: ['humanInput.none', 'humanInput.minor', 'humanInput.moderate', 'humanInput.major', 'humanInput.unrecorded'] },
   { title: 'Ratings, comments and AI discussion', open: false, keys: ['rating.label', 'discuss.label', 'discuss.prompt'] },
-  { title: 'Methods and About', open: false, keys: ['methods.promptSummary', 'methods.description', 'about.description'] },
+  { title: 'Methods and About', open: false, keys: ['methods.promptSummary', 'methods.gradesSummary', 'methods.description', 'about.description'] },
 ];
 
 export const KEYS = Object.keys(FIELDS) as SiteTextKey[];

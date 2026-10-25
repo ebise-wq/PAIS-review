@@ -2,7 +2,7 @@
   "site.name": "PAIS Reviews",
   "site.pilotBanner": "Disclaimer: this is an early pilot project. Please do not share publicly yet.",
   "site.footer": "Reviews are written by Claude against a published [method](/methods), then read and published by the editor. They are one considered opinion, not a consensus view, and they can be wrong.\n\nThink a review is wrong? Say so in the comments under it — that is where it gets argued out.\n\nHave something to say about the method or the system as a whole? Write a comment under [method](/methods).",
-  "home.intro": "Each paper is reviewed against a published guide, graded out of 10, and summarised by its main strengths and weaknesses.",
+  "home.intro": "Each paper is reviewed against a published guide, [graded out of 10](/methods#grade-scheme), and summarised by its main strengths and weaknesses.",
   "review.contextNote": "Circumstances around the work, not part of the assessment of its methods.",
   "review.guideNotesIntro": "Points this paper raised that the [guide](/methods) does not yet cover. They are not applied to this review; the editor decides what goes into the next version. (These points mostly aren't very useful yet)",
   "review.provenance": "Read and published by the editor.",
