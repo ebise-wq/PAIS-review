@@ -1,9 +1,10 @@
 #!/usr/bin/env node
 /**
- * Records how a review was made in its frontmatter: token use and duration from this
- * Claude Code session's transcript, and, if given, the blind fact check's tally.
+ * Records how a review was made in <slug>.process.json beside it: token use and active
+ * time from this Claude Code session's transcript. The fact-check findings in that file
+ * are written by the review skill before this runs; they are kept, and checked.
  *
- *   npm run -s session-stats -- content/reviews/<file>.md --fact-check major,moderate,minor,fixed
+ *   npm run -s session-stats -- content/reviews/<file>.md
  *
  * The transcript is found from CLAUDE_CODE_SESSION_ID, or pass --transcript <path>. The
  * totals cover the whole session, including any other work done in it, so write one
@@ -12,8 +13,8 @@
 import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
-import { setFrontmatterField } from '../src/lib/frontmatter.ts';
-import { parseFactCheck, sessionUrl, sumUsage } from '../src/lib/session-stats.ts';
+import { sessionUrl, sumUsage } from '../src/lib/session-stats.ts';
+import { factCheckSummary, parseProcess, readableCount, totalTokens } from '../src/lib/process.ts';
 
 const args = process.argv.slice(2);
 const option = (name) => {
@@ -21,12 +22,12 @@ const option = (name) => {
   return at === -1 ? undefined : args.splice(at, 2)[1];
 };
 const transcriptArg = option('--transcript');
-const factCheckArg = option('--fact-check');
 const [reviewPath] = args;
-if (!reviewPath || !fs.existsSync(reviewPath)) {
-  console.error('Usage: session-stats <review.md> [--fact-check major,moderate,minor,fixed] [--transcript <file.jsonl>]');
+if (!reviewPath || !reviewPath.endsWith('.md') || !fs.existsSync(reviewPath)) {
+  console.error('Usage: session-stats <review.md> [--transcript <file.jsonl>]');
   process.exit(1);
 }
+const recordPath = reviewPath.replace(/\.md$/, '.process.json');
 
 function findTranscript() {
   if (transcriptArg) return transcriptArg;
@@ -65,15 +66,20 @@ const files = transcriptFiles(findTranscript());
 const lines = files.flatMap((file) => fs.readFileSync(file, 'utf8').split('\n'));
 const totals = sumUsage(lines);
 
-let source = fs.readFileSync(reviewPath, 'utf8');
-source = setFrontmatterField(source, 'tokens', totals.tokens);
+const existing = fs.existsSync(recordPath) ? JSON.parse(fs.readFileSync(recordPath, 'utf8')) : {};
 const url = sessionUrl(process.env.CLAUDE_CODE_REMOTE_SESSION_ID);
-source = setFrontmatterField(source, 'session', { minutes: totals.minutes, ...(url ? { url } : {}) });
-if (factCheckArg) source = setFrontmatterField(source, 'factCheck', parseFactCheck(factCheckArg));
-fs.writeFileSync(reviewPath, source);
+const record = {
+  ...existing,
+  tokens: totals.tokens,
+  session: { minutes: totals.minutes, ...(url ? { url } : {}) },
+};
+fs.writeFileSync(recordPath, `${JSON.stringify(record, null, 2)}\n`);
 
-const all = Object.values(totals.tokens).reduce((a, b) => a + b, 0);
+const { process: parsed, problems } = parseProcess(record);
 console.log(
-  `${reviewPath}: ${all.toLocaleString('en-GB')} tokens over ${totals.calls} model calls (${files.length} transcript file${files.length === 1 ? '' : 's'}), ${totals.minutes} minutes` +
-    (factCheckArg ? `, fact check ${factCheckArg}` : ''),
+  `${recordPath}: ${readableCount(totalTokens(totals.tokens))} tokens over ${totals.calls} model calls ` +
+    `(${files.length} transcript file${files.length === 1 ? '' : 's'}), ${totals.minutes} active minutes. ` +
+    (parsed.factCheck ? `Fact check: ${factCheckSummary(parsed.factCheck.findings)}` : 'No fact check recorded yet.'),
 );
+for (const problem of problems) console.error(`  Problem: ${problem}`);
+if (!parsed.factCheck || problems.length) process.exit(1);

@@ -23,18 +23,18 @@ interface Row {
   verdict: string;
   tokens: { total: number; cached: number } | null;
   minutes: number | null;
-  factCheck: { major: number; moderate: number; minor: number; fixed: number } | null;
+  /** One line, e.g. "1 major (fixed); 2 moderate (1 fixed, 1 disputed)". */
+  factCheck: string | null;
 }
 
 const compact = (n: number) => (n >= 1e6 ? `${(n / 1e6).toFixed(1)}M` : `${Math.round(n / 1e3)}k`);
 
-/** "1.2M tokens (1.0M cached) · 48 min · fact check: 0 major, 2 moderate, 5 minor, 6 fixed" */
+/** "1.2M tokens (1.0M cached) · 48 min · fact check: 2 moderate (1 fixed, 1 disputed)" */
 function processLine(row: Row): string | null {
   const parts = [
     row.tokens !== null && `${compact(row.tokens.total)} tokens (${compact(row.tokens.cached)} cached)`,
     row.minutes !== null && `${row.minutes} min`,
-    row.factCheck &&
-      `fact check: ${row.factCheck.major} major, ${row.factCheck.moderate} moderate, ${row.factCheck.minor} minor, ${row.factCheck.fixed} fixed`,
+    row.factCheck && `fact check: ${row.factCheck}`,
   ].filter(Boolean);
   return parts.length ? parts.join(' · ') : null;
 }

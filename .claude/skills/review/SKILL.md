@@ -250,8 +250,33 @@ hyphenated. For example `2024-lidocaine-hpbcd-post-covid.md`.
    Do not give it your conversation, your reasoning or your view of the paper. Fix what it
    finds that is right. If a fix changes the analysis enough to change the grade, change the
    summary and the frontmatter together. Tell the user what it found, with the labels, and
-   what you changed. Count only the findings that were right, by label, and how many of them
-   you fixed: you need these four numbers for the record below.
+   what you changed.
+
+   Then record every finding, right or not, in `content/reviews/<file>.process.json` beside
+   the review. Readers see this list under the review, so record the fact check's findings
+   as it gave them, and do not leave out the ones you rejected:
+
+   ```json
+   {
+     "factCheck": {
+       "findings": [
+         {
+           "severity": "moderate",
+           "claim": "<what the review said, quoted as it was before any fix>",
+           "issue": "<what the fact check reported, in one or two sentences>",
+           "source": "<what the source says, quoted, if the fact check gave it>",
+           "outcome": "fixed",
+           "response": "<only for partly or disputed: why, in one or two sentences>"
+         }
+       ]
+     }
+   }
+   ```
+
+   `outcome` is `fixed`, `partly` (some of it was right) or `disputed` (you checked and it
+   was wrong). `response` is required for `partly` and `disputed`: say what in the source
+   shows it, plainly, without arguing. If the fact check found nothing, write
+   `"findings": []`.
 2. Run `npm run build` to confirm the frontmatter parses, the grade line matches the score,
    and the site still builds.
 3. Show the user the verdict, score, strengths and weaknesses before committing.
@@ -259,10 +284,10 @@ hyphenated. For example `2024-lidocaine-hpbcd-post-covid.md`.
    what it was and how you read it: the full text and where it came from, which figures you
    saw as images and which only from captions, which supplementary files, and every link you
    fetched. Not what exists, and not what you remember about the paper.
-5. Record how the review was made:
-   `npm run -s session-stats -- content/reviews/<file>.md --fact-check <major>,<moderate>,<minor>,<fixed>`.
-   It writes the session's token use and time, and the fact check tally, into the
-   frontmatter. The totals cover the whole session, so write one review per session.
+5. Record how the review was made: `npm run -s session-stats -- content/reviews/<file>.md`.
+   It adds the session's token use and active time to the `.process.json` file and checks
+   the findings you wrote; fix anything it reports. The totals cover the whole session, so
+   write one review per session. Commit the `.process.json` file with the review.
 6. Save it as a draft: add `draft: true` to the frontmatter. Commit and push only when the
    user says so. A draft is not on the site; the user reads it in the site design at
    `/admin/preview/<filename without .md>` and publishes it from the top of that page, which

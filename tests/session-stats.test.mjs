@@ -1,8 +1,7 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { parseFactCheck, sessionUrl, sumUsage } from '../src/lib/session-stats.ts';
-import { setFrontmatterField } from '../src/lib/frontmatter.ts';
-import { parseReview } from '../src/lib/reviews.ts';
+import { sessionUrl, sumUsage } from '../src/lib/session-stats.ts';
+import { factCheckSummary, parseProcess, readableCount } from '../src/lib/process.ts';
 
 const line = (id, usage, timestamp) => JSON.stringify({ type: 'assistant', timestamp, message: { id, usage } });
 
@@ -18,25 +17,36 @@ test('a model call is counted once, however many lines repeat it; long pauses ar
   assert.deepEqual(totals, { tokens: { input: 20, output: 10, cacheRead: 200, cacheWrite: 40 }, calls: 2, minutes: 15 });
 });
 
-test('the fact check tally is four whole numbers, with no more fixed than found', () => {
-  assert.deepEqual(parseFactCheck('0, 2, 5, 6'), { major: 0, moderate: 2, minor: 5, fixed: 6 });
-  assert.throws(() => parseFactCheck('1,2,3'));
-  assert.throws(() => parseFactCheck('0,0,1,2'), /More fixed/);
-});
-
 test('a cloud session id becomes its claude.ai address', () => {
   assert.equal(sessionUrl('cse_015Jbq9NHe9Pzk5njtJKiJHL'), 'https://claude.ai/code/session_015Jbq9NHe9Pzk5njtJKiJHL');
   assert.equal(sessionUrl(undefined), undefined);
 });
 
-test('the record is written on one line each and read back by the site', () => {
-  let src = '---\ntitle: T\nkind: paper\nscore: 6\nverdict: "V."\nreviewedOn: 2026-10-26\n---\n\nBody.\n';
-  src = setFrontmatterField(src, 'tokens', { input: 20, output: 10, cacheRead: 200, cacheWrite: 40 });
-  src = setFrontmatterField(src, 'session', { minutes: 50, url: 'https://claude.ai/code/session_x' });
-  src = setFrontmatterField(src, 'factCheck', { major: 0, moderate: 2, minor: 5, fixed: 6 });
-  assert.match(src, /\ntokens: \{input: 20, output: 10, cacheRead: 200, cacheWrite: 40\}\n/);
-  const review = parseReview(src, 't');
-  assert.deepEqual(review.tokens, { input: 20, output: 10, cacheRead: 200, cacheWrite: 40 });
-  assert.deepEqual(review.session, { minutes: 50, url: 'https://claude.ai/code/session_x' });
-  assert.deepEqual(review.factCheck, { major: 0, moderate: 2, minor: 5, fixed: 6 });
+const finding = (severity, outcome, extra = {}) => ({ severity, outcome, claim: 'n=103', issue: 'The source says 102.', ...extra });
+
+test('the record is read field by field; a bad finding is dropped with a reason, not fatal', () => {
+  const { process, problems } = parseProcess({
+    tokens: { input: 1, output: 2, cacheRead: 3, cacheWrite: 4 },
+    session: { minutes: 48, url: 'https://claude.ai/code/session_x' },
+    factCheck: {
+      findings: [
+        finding('major', 'fixed'),
+        finding('minor', 'disputed', { response: 'Table 1 gives 103.' }),
+        { severity: 'huge', outcome: 'fixed', claim: 'x', issue: 'y' },
+        finding('moderate', 'partly'),
+      ],
+    },
+  });
+  assert.deepEqual(process.tokens, { input: 1, output: 2, cacheRead: 3, cacheWrite: 4 });
+  assert.equal(process.factCheck.findings.length, 3);
+  assert.equal(problems.length, 2); // the bad severity, and "partly" without a response
+});
+
+test('the summary says, per severity, what happened to each issue', () => {
+  assert.equal(
+    factCheckSummary([finding('major', 'fixed'), finding('moderate', 'fixed'), finding('moderate', 'disputed'), finding('minor', 'fixed'), finding('minor', 'fixed')]),
+    '1 major (fixed); 2 moderate (1 fixed, 1 disputed); 2 minor (fixed)',
+  );
+  assert.equal(factCheckSummary([]), 'No issues found.');
+  assert.equal(readableCount(2_430_000), '2.4 million');
 });

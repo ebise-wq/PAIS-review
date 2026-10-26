@@ -1,8 +1,9 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import matter from 'gray-matter';
+import { parseProcess, type ReviewProcess } from './process';
 import { reconcileGrade } from './hoist';
-import { HUMAN_INPUT_LEVELS, REVIEW_KINDS, SIGNALS, FACT_CHECK_KEYS, TOKEN_KEYS, accessOf, countsOf, isHumanInput, sessionOf, type ContextNote, type Review, type ReviewFrontmatter, type ReviewKind, type Signal } from './types';
+import { HUMAN_INPUT_LEVELS, REVIEW_KINDS, SIGNALS, accessOf, isHumanInput, type ContextNote, type Review, type ReviewFrontmatter, type ReviewKind, type Signal } from './types';
 
 const REVIEWS_DIR = path.join(process.cwd(), 'content', 'reviews');
 
@@ -125,9 +126,6 @@ function coerce(data: Record<string, unknown>, slug: string, body: string): Revi
     model: typeof data.model === 'string' ? data.model : undefined,
     effort: typeof data.effort === 'string' && data.effort.trim() ? data.effort.trim().toLowerCase() : undefined,
     read: strings(data.read),
-    tokens: countsOf(data.tokens, TOKEN_KEYS),
-    session: sessionOf(data.session),
-    factCheck: countsOf(data.factCheck, FACT_CHECK_KEYS),
     access: accessOf(data.access),
     sources: strings(data.sources),
     humanInput,
@@ -145,6 +143,20 @@ export function parseReview(raw: string, slug: string): Review {
   return { ...coerce(data, slug, content), slug, body: content.trim() };
 }
 
+/** The record of how a review was made, if it has one. A broken file is reported, not fatal. */
+export function readProcess(slug: string): ReviewProcess | undefined {
+  const file = path.join(REVIEWS_DIR, `${slug}.process.json`);
+  if (!fs.existsSync(file)) return undefined;
+  try {
+    const { process, problems } = parseProcess(JSON.parse(fs.readFileSync(file, 'utf8')));
+    for (const problem of problems) console.warn(`${slug}.process.json: ${problem}`);
+    return process;
+  } catch (error) {
+    console.error(`${slug}.process.json is not valid JSON; leaving it out.`, error);
+    return undefined;
+  }
+}
+
 export function getAllReviews(options: { includeDrafts?: boolean } = {}): Review[] {
   if (!fs.existsSync(REVIEWS_DIR)) return [];
 
@@ -155,7 +167,8 @@ export function getAllReviews(options: { includeDrafts?: boolean } = {}): Review
       const slug = file.replace(/\.md$/, '');
       const raw = fs.readFileSync(path.join(REVIEWS_DIR, file), 'utf8');
       const { data, content } = matter(raw);
-      return { ...coerce(data, slug, content), slug, body: content.trim() };
+      const process = readProcess(slug);
+      return { ...coerce(data, slug, content), slug, body: content.trim(), ...(process ? { process } : {}) };
     })
     .filter((review) => options.includeDrafts || !review.draft)
     .sort((a, b) => b.reviewedOn.localeCompare(a.reviewedOn) || a.title.localeCompare(b.title));

@@ -55,25 +55,6 @@ export function sumUsage(lines: Iterable<string>): SessionTotals {
   return { tokens, calls: calls.size, minutes };
 }
 
-export interface FactCheckTally {
-  major: number;
-  moderate: number;
-  minor: number;
-  /** How many of those were corrected in the review. */
-  fixed: number;
-}
-
-/** "major,moderate,minor,fixed", e.g. "0,2,5,6". */
-export function parseFactCheck(value: string): FactCheckTally {
-  const parts = value.split(',').map((part) => Number(part.trim()));
-  if (parts.length !== 4 || parts.some((n) => !Number.isInteger(n) || n < 0)) {
-    throw new Error('Give the fact check as four whole numbers: major,moderate,minor,fixed (e.g. 0,2,5,6).');
-  }
-  const [major, moderate, minor, fixed] = parts;
-  if (fixed > major + moderate + minor) throw new Error('More fixed than found.');
-  return { major, moderate, minor, fixed };
-}
-
 /** The claude.ai address of a cloud session, from the id Claude Code gives it ("cse_…"). */
 export function sessionUrl(remoteId: string | undefined): string | undefined {
   const match = remoteId ? /^cse_([A-Za-z0-9]+)$/.exec(remoteId) : null;

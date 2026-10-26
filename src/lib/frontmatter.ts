@@ -8,11 +8,7 @@ import matter from 'gray-matter';
  * Checks its own work: if the file does not read back with the intended value, it
  * throws rather than commit something it did not mean to.
  */
-export function setFrontmatterField(
-  source: string,
-  key: string,
-  value: string | boolean | string[] | Record<string, string | number> | null,
-): string {
+export function setFrontmatterField(source: string, key: string, value: string | boolean | string[] | null): string {
   if (!/^[A-Za-z][\w-]*$/.test(key)) throw new Error(`Bad frontmatter key: ${key}`);
   if (!source.startsWith('---')) throw new Error('The file has no frontmatter block.');
   const end = source.indexOf('\n---', 3);
@@ -31,14 +27,9 @@ export function setFrontmatterField(
   } else {
     const rendered = Array.isArray(value)
       ? `[${value.map((item) => JSON.stringify(item)).join(', ')}]`
-      : typeof value === 'object'
-        ? // A small mapping on one line: {input: 120, output: 30}.
-          `{${Object.entries(value)
-            .map(([name, item]) => `${name}: ${JSON.stringify(item)}`)
-            .join(', ')}}`
-        : typeof value === 'boolean' || /^[a-z][a-z-]*$/.test(value)
-          ? String(value)
-          : JSON.stringify(value);
+      : typeof value === 'boolean' || /^[a-z][a-z-]*$/.test(value)
+        ? String(value)
+        : JSON.stringify(value);
     head = line.test(head) ? head.replace(line, `\n${key}: ${rendered}`) : `${head}\n${key}: ${rendered}`;
   }
 

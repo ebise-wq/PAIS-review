@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { isSignedIn } from '@/lib/session';
 import { getFile, getGithubConfig } from '@/lib/github';
 import { parseReview } from '@/lib/reviews';
+import { parseProcess } from '@/lib/process';
 import type { Review } from '@/lib/types';
 import { ReviewView } from '@/components/ReviewView';
 import { DraftBanner } from '@/components/DraftBanner';
@@ -19,9 +20,9 @@ type Params = { params: Promise<{ slug: string }> };
  * Read from the repository when publishing is set up, so a draft saved a moment ago can be
  * read before the site has rebuilt. Falls back to the deployed copy.
  */
-async function loadSource(slug: string): Promise<string | undefined> {
+async function loadSource(slug: string, extension = '.md'): Promise<string | undefined> {
   const github = getGithubConfig();
-  const repoPath = `content/reviews/${slug}.md`;
+  const repoPath = `content/reviews/${slug}${extension}`;
   if (github) {
     const file = await getFile(github, repoPath);
     if (file) return file.content;
@@ -52,8 +53,18 @@ export default async function PreviewPage({ params }: Params) {
   } else {
     try {
       const source = await loadSource(slug);
-      if (source) review = parseReview(source, slug);
-      else problem = `There is no review at content/reviews/${slug}.md.`;
+      if (source) {
+        review = parseReview(source, slug);
+        // The record of how it was made, which the review page shows at the end.
+        const record = await loadSource(slug, '.process.json').catch(() => undefined);
+        if (record) {
+          try {
+            review = { ...review, process: parseProcess(JSON.parse(record)).process };
+          } catch {
+            // A broken record leaves the section out; the review itself still previews.
+          }
+        }
+      } else problem = `There is no review at content/reviews/${slug}.md.`;
     } catch (error) {
       problem = error instanceof Error ? error.message : 'The review could not be read.';
     }
