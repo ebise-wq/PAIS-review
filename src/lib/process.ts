@@ -5,6 +5,7 @@
  * this review was made". Pure functions; the build, the script and the tests share them.
  */
 import type { TokenTotals } from './session-stats';
+import type { Snapshot } from './changes';
 
 export const SEVERITIES = ['major', 'moderate', 'minor'] as const;
 export type Severity = (typeof SEVERITIES)[number];
@@ -35,6 +36,15 @@ export interface ReviewProcess {
   session?: { minutes?: number; url?: string };
   /** Present once a fact check has run, even if it found nothing. */
   factCheck?: { findings: Finding[] };
+  /**
+   * The review as Claude handed it over, after its own fact check, before anyone else
+   * changed it. Recorded once; the page compares the current review against it.
+   */
+  original?: Snapshot & { savedAt: string };
+  /** The repository version the review was written under: its instructions and skill. */
+  commit?: string;
+  /** Dated notes on changes made after the review was handed over: corrections, re-grades. */
+  changes?: { date: string; summary: string }[];
 }
 
 const text = (value: unknown, max: number) =>
@@ -81,6 +91,43 @@ export function parseProcess(raw: unknown): { process: ReviewProcess; problems: 
       findings.push({ severity, claim, issue, ...(source ? { source } : {}), outcome, ...(response ? { response } : {}) });
     });
     process.factCheck = { findings };
+  }
+
+  const original = record.original as Record<string, unknown> | undefined;
+  if (original) {
+    const strings = (value: unknown) => (Array.isArray(value) ? value.filter((v): v is string => typeof v === 'string') : []);
+    const score = typeof original.score === 'number' ? original.score : undefined;
+    const signal = typeof original.signal === 'string' ? original.signal : undefined;
+    if (typeof original.body === 'string' && typeof original.verdict === 'string' && typeof original.savedAt === 'string') {
+      process.original = {
+        savedAt: original.savedAt,
+        ...(score !== undefined ? { score } : {}),
+        ...(signal ? { signal } : {}),
+        verdict: original.verdict,
+        strengths: strings(original.strengths),
+        weaknesses: strings(original.weaknesses),
+        body: original.body,
+      };
+    } else problems.push('"original" needs savedAt, verdict and body.');
+  }
+
+  if (typeof record.commit === 'string') {
+    if (/^[0-9a-f]{7,40}$/.test(record.commit)) process.commit = record.commit;
+    else problems.push('"commit" is not a git commit id.');
+  }
+
+  if (record.changes !== undefined) {
+    const list = Array.isArray(record.changes) ? record.changes : [];
+    process.changes = list.flatMap((entry, index) => {
+      const item = entry && typeof entry === 'object' ? (entry as Record<string, unknown>) : {};
+      const date = typeof item.date === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(item.date) ? item.date : undefined;
+      const summary = text(item.summary, 600);
+      if (!date || !summary) {
+        problems.push(`Change ${index + 1} needs a YYYY-MM-DD date and a summary; skipped.`);
+        return [];
+      }
+      return [{ date, summary }];
+    });
   }
 
   return { process, problems };

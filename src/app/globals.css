@@ -956,3 +956,14 @@ a[href$='#grade-scheme'] { text-decoration-style: dotted; text-underline-offset:
 .finding-outcome.disputed { background: var(--solid-bg); border-color: var(--solid-br); color: var(--solid-fg); }
 #how-this-review-was-made, #fact-check-findings { scroll-margin-top: 72px; }
 @media (min-width: 1020px) { #how-this-review-was-made, #fact-check-findings { scroll-margin-top: 20px; } }
+
+/* Changes since Claude's version: removed text struck through, added text highlighted. */
+.review-changes { margin-top: 10px; color: var(--text); }
+.review-changes del { color: var(--fatal-fg); background: color-mix(in srgb, var(--fatal-bg) 60%, transparent); text-decoration: line-through; }
+.review-changes ins { color: var(--strong-fg); background: color-mix(in srgb, var(--strong-bg) 60%, transparent); text-decoration: none; }
+.change-label { margin: 12px 0 4px !important; font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.05em; color: var(--muted); font-weight: 600; }
+.change-field ul { margin: 0; padding-left: 18px; }
+.change-paragraph { margin: 0 0 10px !important; line-height: 1.5; }
+.change-log { margin: 6px 0 0; padding-left: 18px; }
+.change-date { color: var(--muted); font-variant-numeric: tabular-nums; }
+#method-since, #changes-since { scroll-margin-top: 72px; }

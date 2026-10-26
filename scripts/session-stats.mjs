@@ -1,8 +1,12 @@
 #!/usr/bin/env node
 /**
  * Records how a review was made in <slug>.process.json beside it: token use and active
- * time from this Claude Code session's transcript. The fact-check findings in that file
- * are written by the review skill before this runs; they are kept, and checked.
+ * time from this Claude Code session's transcript, the repository version it was written
+ * under, and the review as it stands now, as Claude's original for the page to compare
+ * later versions against. The original and the version are recorded once; run it again
+ * with --reset-original only if the review was rewritten from scratch. The fact-check
+ * findings in that file are written by the review skill before this runs; they are kept,
+ * and checked.
  *
  *   npm run -s session-stats -- content/reviews/<file>.md
  *
@@ -11,6 +15,8 @@
  * review per session.
  */
 import fs from 'node:fs';
+import { execFileSync } from 'node:child_process';
+import matter from 'gray-matter';
 import os from 'node:os';
 import path from 'node:path';
 import { sessionUrl, sumUsage } from '../src/lib/session-stats.ts';
@@ -22,6 +28,9 @@ const option = (name) => {
   return at === -1 ? undefined : args.splice(at, 2)[1];
 };
 const transcriptArg = option('--transcript');
+const resetAt = args.indexOf('--reset-original');
+const resetOriginal = resetAt !== -1;
+if (resetOriginal) args.splice(resetAt, 1);
 const [reviewPath] = args;
 if (!reviewPath || !reviewPath.endsWith('.md') || !fs.existsSync(reviewPath)) {
   console.error('Usage: session-stats <review.md> [--transcript <file.jsonl>]');
@@ -68,10 +77,35 @@ const totals = sumUsage(lines);
 
 const existing = fs.existsSync(recordPath) ? JSON.parse(fs.readFileSync(recordPath, 'utf8')) : {};
 const url = sessionUrl(process.env.CLAUDE_CODE_REMOTE_SESSION_ID);
+function snapshot() {
+  const { data, content } = matter(fs.readFileSync(reviewPath, 'utf8'));
+  const list = (value) => (Array.isArray(value) ? value.map(String) : []);
+  return {
+    savedAt: new Date().toISOString(),
+    ...(typeof data.score === 'number' ? { score: data.score } : {}),
+    ...(typeof data.signal === 'string' ? { signal: data.signal } : {}),
+    verdict: String(data.verdict ?? ''),
+    strengths: list(data.strengths),
+    weaknesses: list(data.weaknesses),
+    body: content.trim(),
+  };
+}
+
+function headCommit() {
+  try {
+    return execFileSync('git', ['rev-parse', 'HEAD'], { encoding: 'utf8' }).trim();
+  } catch {
+    return undefined;
+  }
+}
+
+const commit = existing.commit ?? headCommit();
 const record = {
   ...existing,
   tokens: totals.tokens,
   session: { minutes: totals.minutes, ...(url ? { url } : {}) },
+  ...(commit ? { commit } : {}),
+  original: existing.original && !resetOriginal ? existing.original : snapshot(),
 };
 fs.writeFileSync(recordPath, `${JSON.stringify(record, null, 2)}\n`);
 

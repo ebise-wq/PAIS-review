@@ -285,8 +285,10 @@ hyphenated. For example `2024-lidocaine-hpbcd-post-covid.md`.
    saw as images and which only from captions, which supplementary files, and every link you
    fetched. Not what exists, and not what you remember about the paper.
 5. Record how the review was made: `npm run -s session-stats -- content/reviews/<file>.md`.
-   It adds the session's token use and active time to the `.process.json` file and checks
-   the findings you wrote; fix anything it reports. The totals cover the whole session, so
+   It adds the session's token use and active time, the code version, and the review as it
+   stands now (readers see later changes compared against it, so run it after your own
+   fixes) to the `.process.json` file, and checks the findings you wrote; fix anything it
+   reports. The totals cover the whole session, so
    write one review per session. Commit the `.process.json` file with the review.
 6. Save it as a draft: add `draft: true` to the frontmatter. Commit and push only when the
    user says so. A draft is not on the site; the user reads it in the site design at

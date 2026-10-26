@@ -23,6 +23,8 @@ in /admin → Backlog. Longer write-ups live in `docs/roadmap.md`. Not shown on 
 
 ## Missing features
 
+- [ ] [high] A private archive of every review session’s full transcript (a private GitHub repository; the review skill pushes a compressed copy after each review), so any question about how reviews were made can be answered later. Roughly 1–5 MB per review. Needs the editor to create the repository and add it to the Claude Code environment.
+- [ ] [medium] Reviews and fact checks by different models (for example GPT or Gemini alongside Claude), each separately, to reduce shared blind spots. Show each model’s grade and how far they agree; a second opinion becomes the default, not an extra.
 - [ ] [low] On hold: citations on the About page for how well models review. The editor writes text outside the reviews.
 - [ ] [medium] Bluesky posts when a review is published.
 - [ ] [medium] Weekly email digest that readers sign up for, with filters (condition, tag, type of review, score band). Needs the site to send email.
@@ -47,6 +49,7 @@ in /admin → Backlog. Longer write-ups live in `docs/roadmap.md`. Not shown on 
 
 ## Ideas
 
+- [ ] [low] A track record page: the spread of grades, fact-check results across reviews and over time, and how disputed findings held up. Worth more once several models review.
 - [ ] [medium] A weekly scheduled Claude session that checks the site (build, mobile layout, abbreviations, broken links, new comments reporting problems) and adds what it finds here.
 - [ ] [low] Extract structured claims from each review, so the whole collection can be asked "what does the evidence say about X?".
 - [ ] [low] Re-generate a review with its comment thread as extra input, and show what changed.

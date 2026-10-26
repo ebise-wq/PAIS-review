@@ -17,6 +17,9 @@ import { getSiteText } from '@/lib/site-text';
 import { RichText } from '@/components/RichText';
 import { getTags } from '@/lib/tags-store';
 import { conditionTag, tagsOf } from '@/lib/tags';
+import { compareReviews, methodChangesSince, parseChangelog, splitChangelog } from '@/lib/changes';
+import { getDoc } from '@/lib/doc';
+import { ReviewChanges } from '@/components/ReviewChanges';
 import { OUTCOME_LABELS, SEVERITY_LABELS, factCheckSummary, readableCount, totalTokens } from '@/lib/process';
 
 /**
@@ -30,12 +33,32 @@ const NOTES_ID = 'notes-for-the-guide';
 const READ_ID = 'what-claude-read';
 const PROCESS_ID = 'how-this-review-was-made';
 const FINDINGS_ID = 'fact-check-findings';
+const METHOD_ID = 'method-since';
+const CHANGES_ID = 'changes-since';
 
 export function ReviewView({ review, banner }: { review: Review; banner?: ReactNode }) {
   const text = getSiteText();
   const tagList = getTags();
   const read = readList(review);
   const record = review.process;
+  // What changed after Claude handed the review over, and in the method since it was written.
+  const changes = record?.original
+    ? compareReviews(record.original, {
+        score: review.score,
+        signal: review.signal,
+        verdict: review.verdict,
+        strengths: review.strengths ?? [],
+        weaknesses: review.weaknesses ?? [],
+        body: review.body,
+      })
+    : null;
+  const changeCount = changes ? changes.fields.length + changes.paragraphs.length + (record?.changes?.length ?? 0) : 0;
+  const guide = getDoc('guide');
+  const methodSince =
+    review.guideVersion && guide
+      ? methodChangesSince(review.guideVersion, parseChangelog(splitChangelog(guide.body).changelog ?? ''))
+      : [];
+  const repo = process.env.GITHUB_REPO;
   const own = tagsOf(review, tagList);
   const conditions = (review.conditions ?? []).map((name) => ({ name, tag: conditionTag(name, tagList) }));
   const link = paperLink(review);
@@ -244,6 +267,41 @@ export function ReviewView({ review, banner }: { review: Review; banner?: ReactN
             {review.guideVersion ? ` (v${review.guideVersion})` : ''}.{' '}
             <RichText text={text['review.provenance']} inline />
           </p>
+          {methodSince.length > 0 && (
+            <details className="sources-details" id={METHOD_ID}>
+              <summary>
+                {text['review.methodSince']} ({methodSince.length}, now v{guide?.version})
+              </summary>
+              <ul>
+                {methodSince.map((entry) => (
+                  <li key={entry.version}>
+                    <strong>{entry.version}</strong> ({entry.date}): {entry.text}
+                  </li>
+                ))}
+              </ul>
+            </details>
+          )}
+          {record?.commit && (
+            <p className="process-line">
+              {text['review.commitLabel']}:{' '}
+              {repo ? (
+                <a href={`https://github.com/${repo}/blob/${record.commit}/.claude/skills/review/SKILL.md`} target="_blank" rel="noreferrer">
+                  <code>{record.commit.slice(0, 7)}</code>
+                </a>
+              ) : (
+                <code>{record.commit.slice(0, 7)}</code>
+              )}
+            </p>
+          )}
+          {changes && changeCount === 0 && <p className="process-line">{text['review.unchanged']}</p>}
+          {changes && changeCount > 0 && (
+            <details className="sources-details" id={CHANGES_ID}>
+              <summary>
+                {text['review.changesSummary']} ({changeCount})
+              </summary>
+              <ReviewChanges changes={changes} log={record?.changes ?? []} />
+            </details>
+          )}
           {record?.tokens && (
             <p className="process-line">
               <abbr title="Units of text the model processed. Most are the same material read again from a cache.">
