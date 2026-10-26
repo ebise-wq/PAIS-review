@@ -110,6 +110,15 @@ create table if not exists comment_edits (
   edited_at  timestamptz not null default now()
 );
 
+-- What "Remove" deleted, kept so a mistaken removal can be undone: each comment with its
+-- votes and earlier texts, as JSON. Not shown anywhere.
+create table if not exists comments_removed (
+  id         bigserial primary key,
+  comment_id bigint not null,
+  removed_at timestamptz not null default now(),
+  data       jsonb not null
+);
+
 create table if not exists ratings (
   review_slug text not null,
   voter       text not null,

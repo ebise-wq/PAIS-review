@@ -91,12 +91,12 @@ export function ReviewCard({
           </p>
         )}
         <div className="chip-row">
-          {review.weaknesses?.slice(0, 3).map((weakness) => (
+          {review.weaknesses?.slice(0, 2).map((weakness) => (
             <span className="chip weakness" key={weakness}>
               {weakness}
             </span>
           ))}
-          {review.strengths?.slice(0, 2).map((strength) => (
+          {review.strengths?.slice(0, 1).map((strength) => (
             <span className="chip strength" key={strength}>
               {strength}
             </span>

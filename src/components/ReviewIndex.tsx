@@ -10,6 +10,8 @@ import { ReviewCard } from './ReviewCard';
 
 export type ReviewSummary = Omit<Review, 'body'>;
 
+const FOLD_FILTERS_BELOW = 20;
+
 type Sort = 'active' | 'newest' | 'oldest' | 'score-desc' | 'score-asc' | 'comments' | 'discussed' | 'rating';
 
 export function ReviewIndex({
@@ -44,6 +46,11 @@ export function ReviewIndex({
   const [query, setQuery] = useState('');
   const [design, setDesign] = useState('');
   const [topics, setTopics] = useState<string[]>([]);
+  // With only a handful of reviews, five kinds of control fill a phone's first screen and
+  // narrow almost nothing. Fold them behind one button until the list is long enough.
+  const folded = reviews.length < FOLD_FILTERS_BELOW;
+  const [showFilters, setShowFilters] = useState(false);
+  const filterCount = active.length + (design ? 1 : 0) + topics.length;
   const topicMenu = useRef<HTMLDetailsElement>(null);
 
   // The topic menu closes when the reader taps anywhere else, like a native menu.
@@ -172,81 +179,96 @@ export function ReviewIndex({
           value={query}
           onChange={(e) => setQuery(e.target.value)}
         />
-        {conditions.length > 0 && (
-          <div className="chip-row">
-            {conditions.map((condition) => (
-              <button
-                key={condition}
-                type="button"
-                className="chip toggle"
-                aria-pressed={active.includes(condition)}
-                onClick={() => toggle(condition)}
-              >
-                {condition}
-              </button>
-            ))}
-          </div>
+        {folded && (
+          <button
+            type="button"
+            className="filter-toggle"
+            aria-expanded={showFilters}
+            aria-controls="filter-panel"
+            onClick={() => setShowFilters((open) => !open)}
+          >
+            Filter and sort{filterCount > 0 ? ` (${filterCount})` : ''}
+          </button>
         )}
-        {(tags.designs.length > 0 || tags.topics.length > 0) && (
-          <div className="tag-filters">
-            {tags.designs.length > 0 && (
-              <select aria-label={labels.designFilter} value={design} onChange={(e) => setDesign(e.target.value)}>
-                <option value="">{labels.anyDesign}</option>
-                {tags.designs.map((tag) => (
-                  <option key={tag.id} value={tag.id}>
-                    {tag.label}
-                  </option>
-                ))}
-              </select>
-            )}
-            {tags.topics.length > 0 && (
-              <details className="filter-menu" ref={topicMenu}>
-                <summary aria-label={labels.topicFilter}>
-                  {topics.length === 0
-                    ? labels.anyTopic
-                    : topics.length === 1
-                      ? tags.topics.find((t) => t.id === topics[0])?.label
-                      : `${topics.length} topics`}
-                </summary>
-                <div className="filter-menu-list">
-                  {tags.topics.map((tag) => (
-                    <label key={tag.id}>
-                      <input
-                        type="checkbox"
-                        checked={topics.includes(tag.id)}
-                        onChange={() =>
-                          setTopics((current) =>
-                            current.includes(tag.id) ? current.filter((t) => t !== tag.id) : [...current, tag.id],
-                          )
-                        }
-                      />
+        {(!folded || showFilters) && (
+          <div id="filter-panel" className={folded ? 'filter-panel' : 'filter-panel inline'}>
+          {conditions.length > 0 && (
+            <div className="chip-row">
+              {conditions.map((condition) => (
+                <button
+                  key={condition}
+                  type="button"
+                  className="chip toggle"
+                  aria-pressed={active.includes(condition)}
+                  onClick={() => toggle(condition)}
+                >
+                  {condition}
+                </button>
+              ))}
+            </div>
+          )}
+          {(tags.designs.length > 0 || tags.topics.length > 0) && (
+            <div className="tag-filters">
+              {tags.designs.length > 0 && (
+                <select aria-label={labels.designFilter} value={design} onChange={(e) => setDesign(e.target.value)}>
+                  <option value="">{labels.anyDesign}</option>
+                  {tags.designs.map((tag) => (
+                    <option key={tag.id} value={tag.id}>
                       {tag.label}
-                    </label>
+                    </option>
                   ))}
-                  {topics.length > 0 && (
-                    <button type="button" className="linkish" onClick={() => setTopics([])}>
-                      {labels.anyTopic}
-                    </button>
-                  )}
-                </div>
-              </details>
-            )}
+                </select>
+              )}
+              {tags.topics.length > 0 && (
+                <details className="filter-menu" ref={topicMenu}>
+                  <summary aria-label={labels.topicFilter}>
+                    {topics.length === 0
+                      ? labels.anyTopic
+                      : topics.length === 1
+                        ? tags.topics.find((t) => t.id === topics[0])?.label
+                        : `${topics.length} topics`}
+                  </summary>
+                  <div className="filter-menu-list">
+                    {tags.topics.map((tag) => (
+                      <label key={tag.id}>
+                        <input
+                          type="checkbox"
+                          checked={topics.includes(tag.id)}
+                          onChange={() =>
+                            setTopics((current) =>
+                              current.includes(tag.id) ? current.filter((t) => t !== tag.id) : [...current, tag.id],
+                            )
+                          }
+                        />
+                        {tag.label}
+                      </label>
+                    ))}
+                    {topics.length > 0 && (
+                      <button type="button" className="linkish" onClick={() => setTopics([])}>
+                        {labels.anyTopic}
+                      </button>
+                    )}
+                  </div>
+                </details>
+              )}
+            </div>
+          )}
+          <div className="spacer" />
+          <div className="sort-control">
+            <label htmlFor="sort">Sort</label>
+            <select id="sort" value={sort} onChange={(e) => setSort(e.target.value as Sort)}>
+              {hasEngagement && <option value="active">Active</option>}
+              <option value="newest">Newest first</option>
+              <option value="oldest">Oldest first</option>
+              <option value="score-desc">Highest score</option>
+              <option value="score-asc">Lowest score</option>
+              {hasEngagement && <option value="comments">Most comments</option>}
+              {hasEngagement && <option value="discussed">Recently discussed</option>}
+              {hasEngagement && <option value="rating">Highest reader rating</option>}
+            </select>
+          </div>
           </div>
         )}
-        <div className="spacer" />
-        <div className="sort-control">
-          <label htmlFor="sort">Sort</label>
-          <select id="sort" value={sort} onChange={(e) => setSort(e.target.value as Sort)}>
-            {hasEngagement && <option value="active">Active</option>}
-            <option value="newest">Newest first</option>
-            <option value="oldest">Oldest first</option>
-            <option value="score-desc">Highest score</option>
-            <option value="score-asc">Lowest score</option>
-            {hasEngagement && <option value="comments">Most comments</option>}
-            {hasEngagement && <option value="discussed">Recently discussed</option>}
-            {hasEngagement && <option value="rating">Highest reader rating</option>}
-          </select>
-        </div>
       </div>
 
       {shown.length === 0 ? (
