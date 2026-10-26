@@ -35,6 +35,11 @@ export async function GET() {
     score: review.score ?? null,
     signal: review.signal ?? null,
     verdict: review.verdict,
+    tokens: review.tokens
+      ? { total: Object.values(review.tokens).reduce((a, b) => a + b, 0), cached: review.tokens.cacheRead }
+      : null,
+    minutes: review.session?.minutes ?? null,
+    factCheck: review.factCheck ?? null,
   }));
 
   return NextResponse.json({ reviews });

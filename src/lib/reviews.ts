@@ -2,7 +2,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import matter from 'gray-matter';
 import { reconcileGrade } from './hoist';
-import { HUMAN_INPUT_LEVELS, REVIEW_KINDS, SIGNALS, accessOf, isHumanInput, type ContextNote, type Review, type ReviewFrontmatter, type ReviewKind, type Signal } from './types';
+import { HUMAN_INPUT_LEVELS, REVIEW_KINDS, SIGNALS, FACT_CHECK_KEYS, TOKEN_KEYS, accessOf, countsOf, isHumanInput, sessionOf, type ContextNote, type Review, type ReviewFrontmatter, type ReviewKind, type Signal } from './types';
 
 const REVIEWS_DIR = path.join(process.cwd(), 'content', 'reviews');
 
@@ -125,6 +125,9 @@ function coerce(data: Record<string, unknown>, slug: string, body: string): Revi
     model: typeof data.model === 'string' ? data.model : undefined,
     effort: typeof data.effort === 'string' && data.effort.trim() ? data.effort.trim().toLowerCase() : undefined,
     read: strings(data.read),
+    tokens: countsOf(data.tokens, TOKEN_KEYS),
+    session: sessionOf(data.session),
+    factCheck: countsOf(data.factCheck, FACT_CHECK_KEYS),
     access: accessOf(data.access),
     sources: strings(data.sources),
     humanInput,

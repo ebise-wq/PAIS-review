@@ -175,6 +175,10 @@ export async function normaliseReview(raw: string): Promise<NormaliseResult> {
       ? original.topics.map((t) => String(t).trim()).filter(Boolean)
       : undefined,
     // What the model read is provenance too: kept from the source, never inferred.
+    // The process record is the session's, not the tidier's: kept exactly, never made up.
+    ...(original.tokens ? { tokens: original.tokens } : {}),
+    ...(original.session ? { session: original.session } : {}),
+    ...(original.factCheck ? { factCheck: original.factCheck } : {}),
     read: Array.isArray(original.read) ? original.read.map((s) => String(s).trim()).filter(Boolean) : undefined,
     access: accessOf(original.access),
     sources: Array.isArray(original.sources)

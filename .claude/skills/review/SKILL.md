@@ -240,10 +240,18 @@ hyphenated. For example `2024-lidocaine-hpbcd-post-covid.md`.
    does not report — against those files; do not judge the grade, the framing or the
    argument; do not use the web or its own memory of the paper; report each claim that is
    wrong, unsupported by the files, or internally inconsistent with another part of the
-   review, quoting the review and the source. Do not give it your conversation, your
-   reasoning or your view of the paper. Fix what it finds that is right. If a fix changes the
-   analysis enough to change the grade, change the summary and the frontmatter together.
-   Tell the user what it found and what you changed.
+   review, quoting the review and the source, and label each one:
+   - **major** — correcting it would change the grade, the verdict, or a listed strength or
+     weakness;
+   - **moderate** — it changes what a section argues, but not the grade or the verdict;
+   - **minor** — a detail that changes no argument: a number with no consequence, a
+     misattributed quote, a citation detail.
+
+   Do not give it your conversation, your reasoning or your view of the paper. Fix what it
+   finds that is right. If a fix changes the analysis enough to change the grade, change the
+   summary and the frontmatter together. Tell the user what it found, with the labels, and
+   what you changed. Count only the findings that were right, by label, and how many of them
+   you fixed: you need these four numbers for the record below.
 2. Run `npm run build` to confirm the frontmatter parses, the grade line matches the score,
    and the site still builds.
 3. Show the user the verdict, score, strengths and weaknesses before committing.
@@ -251,10 +259,14 @@ hyphenated. For example `2024-lidocaine-hpbcd-post-covid.md`.
    what it was and how you read it: the full text and where it came from, which figures you
    saw as images and which only from captions, which supplementary files, and every link you
    fetched. Not what exists, and not what you remember about the paper.
-5. Save it as a draft: add `draft: true` to the frontmatter. Commit and push only when the
+5. Record how the review was made:
+   `npm run -s session-stats -- content/reviews/<file>.md --fact-check <major>,<moderate>,<minor>,<fixed>`.
+   It writes the session's token use and time, and the fact check tally, into the
+   frontmatter. The totals cover the whole session, so write one review per session.
+6. Save it as a draft: add `draft: true` to the frontmatter. Commit and push only when the
    user says so. A draft is not on the site; the user reads it in the site design at
    `/admin/preview/<filename without .md>` and publishes it from the top of that page, which
    is also where they set the human-input level. Give them that link after pushing.
-6. Do not set `humanInput` yourself: only the user knows how much they changed. If they tell
+7. Do not set `humanInput` yourself: only the user knows how much they changed. If they tell
    you the level and ask you to publish directly, set `humanInput` to their answer and leave
    out `draft`.

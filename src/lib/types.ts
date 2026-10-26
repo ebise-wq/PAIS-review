@@ -1,3 +1,4 @@
+import type { FactCheckTally, TokenTotals } from './session-stats';
 export type Confidence = 'high' | 'moderate' | 'low';
 export type Importance = 'high' | 'moderate' | 'low';
 
@@ -70,6 +71,34 @@ export function accessSummary(access: Access): string {
   const out = parts.join('; ');
   return out.charAt(0).toUpperCase() + out.slice(1);
 }
+
+/**
+ * A small mapping of counts from frontmatter ({input: 120, output: 30}), or undefined if
+ * any expected key is missing or not a whole number. Used for the process records.
+ */
+export function countsOf<K extends string>(value: unknown, keys: readonly K[]): Record<K, number> | undefined {
+  if (!value || typeof value !== 'object') return undefined;
+  const record = value as Record<string, unknown>;
+  const out = {} as Record<K, number>;
+  for (const key of keys) {
+    const n = Number(record[key]);
+    if (!Number.isInteger(n) || n < 0) return undefined;
+    out[key] = n;
+  }
+  return out;
+}
+
+export function sessionOf(value: unknown): { minutes?: number; url?: string } | undefined {
+  if (!value || typeof value !== 'object') return undefined;
+  const record = value as Record<string, unknown>;
+  const minutes = Number(record.minutes);
+  const url = typeof record.url === 'string' && /^https:\/\//.test(record.url) ? record.url : undefined;
+  const out = { ...(Number.isInteger(minutes) && minutes >= 0 ? { minutes } : {}), ...(url ? { url } : {}) };
+  return Object.keys(out).length ? out : undefined;
+}
+
+export const TOKEN_KEYS = ['input', 'output', 'cacheRead', 'cacheWrite'] as const;
+export const FACT_CHECK_KEYS = ['major', 'moderate', 'minor', 'fixed'] as const;
 
 /** What the model read, as one list, whether the review records it the current way or the old one. */
 export function readList(review: Pick<ReviewFrontmatter, 'read' | 'access' | 'sources'>): string[] {
@@ -155,6 +184,14 @@ export interface ReviewFrontmatter {
   access?: Access;
   /** Older reviews: everything else the model consulted, alongside `access`. */
   sources?: string[];
+  /**
+   * How the review was made, recorded by scripts/session-stats.mjs from the session that
+   * wrote it: token use, time taken, and what the blind fact check found. Not shown on
+   * the page; there for later analysis. Absent on reviews written before it was recorded.
+   */
+  tokens?: TokenTotals;
+  session?: { minutes?: number; url?: string };
+  factCheck?: FactCheckTally;
   /** How much the editor changed the model's text. Absent on reviews published before it was recorded. */
   humanInput?: HumanInput;
   /** Set true while drafting; excluded from the site. */
