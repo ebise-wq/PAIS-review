@@ -21,6 +21,22 @@ interface Row {
   score: number | null;
   signal: Signal | null;
   verdict: string;
+  tokens: { total: number; cached: number } | null;
+  minutes: number | null;
+  /** One line, e.g. "1 major (fixed); 2 moderate (1 fixed, 1 disputed)". */
+  factCheck: string | null;
+}
+
+const compact = (n: number) => (n >= 1e6 ? `${(n / 1e6).toFixed(1)}M` : `${Math.round(n / 1e3)}k`);
+
+/** "1.2M tokens (1.0M cached) · 48 min · fact check: 2 moderate (1 fixed, 1 disputed)" */
+function processLine(row: Row): string | null {
+  const parts = [
+    row.tokens !== null && `${compact(row.tokens.total)} tokens (${compact(row.tokens.cached)} cached)`,
+    row.minutes !== null && `${row.minutes} min`,
+    row.factCheck && `fact check: ${row.factCheck}`,
+  ].filter(Boolean);
+  return parts.length ? parts.join(' · ') : null;
 }
 
 type Action = 'withdraw' | 'restore' | 'humanInput' | 'tags';
@@ -126,6 +142,7 @@ export function ReviewManager({ onExpired }: { onExpired: () => void }) {
             {row.preprint ? ' (preprint)' : ''}
             {row.guideVersion ? ` · guide v${row.guideVersion}` : ' · no guide version'}
           </span>
+          {processLine(row) && <span className="manage-meta">{processLine(row)}</span>}
           {row.draft && <p className="manage-verdict">{row.verdict}</p>}
           <label className="manage-input">
             Human input{' '}

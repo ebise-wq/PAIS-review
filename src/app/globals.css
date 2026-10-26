@@ -938,3 +938,32 @@ a[href$='#grade-scheme'] { text-decoration-style: dotted; text-underline-offset:
 .comment-more-list .linkish { text-align: left; padding: 9px 10px; border-radius: 6px; font-size: 0.88rem; }
 .comment-more-list .linkish:hover { background: var(--surface-2); }
 .comment-form.edit { margin: 8px 0 10px; }
+
+/* "How this review was made": effort, fact check, what Claude read, the findings. */
+.provenance-title { margin: 0 0 8px; font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.06em; color: var(--muted); font-weight: 600; }
+.provenance .process-line { margin-top: 8px; }
+.provenance abbr { text-decoration: underline dotted; text-underline-offset: 3px; cursor: help; }
+.findings ol { margin: 10px 0 0; padding-left: 20px; }
+.findings li { margin-bottom: 14px; }
+.findings li p { margin: 4px 0 0; color: var(--text); }
+.findings li em { color: var(--muted); font-style: normal; }
+.finding-tags { display: flex; gap: 6px; }
+.finding-severity, .finding-outcome { font-size: 0.72rem; padding: 1px 7px; border-radius: 999px; border: 1px solid var(--border); }
+.finding-severity.major { background: var(--fatal-bg); border-color: var(--fatal-br); color: var(--fatal-fg); }
+.finding-severity.moderate { background: var(--borderline-bg); border-color: var(--borderline-br); color: var(--borderline-fg); }
+.finding-severity.minor { color: var(--muted); }
+.finding-outcome.fixed { background: var(--strong-bg); border-color: var(--strong-br); color: var(--strong-fg); }
+.finding-outcome.disputed { background: var(--solid-bg); border-color: var(--solid-br); color: var(--solid-fg); }
+#how-this-review-was-made, #fact-check-findings { scroll-margin-top: 72px; }
+@media (min-width: 1020px) { #how-this-review-was-made, #fact-check-findings { scroll-margin-top: 20px; } }
+
+/* Changes since Claude's version: removed text struck through, added text highlighted. */
+.review-changes { margin-top: 10px; color: var(--text); }
+.review-changes del { color: var(--fatal-fg); background: color-mix(in srgb, var(--fatal-bg) 60%, transparent); text-decoration: line-through; }
+.review-changes ins { color: var(--strong-fg); background: color-mix(in srgb, var(--strong-bg) 60%, transparent); text-decoration: none; }
+.change-label { margin: 12px 0 4px !important; font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.05em; color: var(--muted); font-weight: 600; }
+.change-field ul { margin: 0; padding-left: 18px; }
+.change-paragraph { margin: 0 0 10px !important; line-height: 1.5; }
+.change-log { margin: 6px 0 0; padding-left: 18px; }
+.change-date { color: var(--muted); font-variant-numeric: tabular-nums; }
+#method-since, #changes-since { scroll-margin-top: 72px; }

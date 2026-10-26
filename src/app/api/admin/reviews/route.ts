@@ -3,6 +3,7 @@ import { HUMAN_INPUT_LEVELS, isHumanInput } from '@/lib/types';
 import { setFrontmatterField } from '@/lib/frontmatter';
 import matter from 'gray-matter';
 import { getAllReviews } from '@/lib/reviews';
+import { factCheckSummary, totalTokens } from '@/lib/process';
 import { isSignedIn } from '@/lib/session';
 import { GithubError, getFile, getGithubConfig, putFile } from '@/lib/github';
 import { TAGS_PATH, checkReviewTags, parseTagList } from '@/lib/tags';
@@ -35,6 +36,11 @@ export async function GET() {
     score: review.score ?? null,
     signal: review.signal ?? null,
     verdict: review.verdict,
+    tokens: review.process?.tokens
+      ? { total: totalTokens(review.process.tokens), cached: review.process.tokens.cacheRead }
+      : null,
+    minutes: review.process?.session?.minutes ?? null,
+    factCheck: review.process?.factCheck ? factCheckSummary(review.process.factCheck.findings) : null,
   }));
 
   return NextResponse.json({ reviews });

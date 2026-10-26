@@ -1,3 +1,4 @@
+import type { ReviewProcess } from './process';
 export type Confidence = 'high' | 'moderate' | 'low';
 export type Importance = 'high' | 'moderate' | 'low';
 
@@ -164,6 +165,8 @@ export interface ReviewFrontmatter {
 export interface Review extends ReviewFrontmatter {
   slug: string;
   body: string;
+  /** From <slug>.process.json beside the review, when there is one. */
+  process?: ReviewProcess;
 }
 
 export type Tone = 'strong' | 'solid' | 'borderline' | 'weak' | 'fatal' | 'neutral';

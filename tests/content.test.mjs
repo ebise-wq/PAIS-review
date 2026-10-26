@@ -7,6 +7,7 @@ import { parseBacklog, serializeBacklog } from '../src/lib/backlog.ts';
 import { parseOverrides } from '../src/lib/site-text-schema.ts';
 import { getDoc } from '../src/lib/doc.ts';
 import { parseTagList } from '../src/lib/tags.ts';
+import { parseProcess } from '../src/lib/process.ts';
 
 test('every review file parses', () => {
   const files = fs.readdirSync('content/reviews').filter((f) => f.endsWith('.md'));
@@ -41,5 +42,13 @@ test('the tag list reads cleanly, and every tag on a review is on it', () => {
     for (const name of review.conditions ?? []) assert.ok(conditions.has(name), `${f}: condition ${name} is not in the tag list`);
     if (review.design) assert.ok(designs.has(review.design), `${f}: unknown design ${review.design}`);
     for (const id of review.topics ?? []) assert.ok(topics.has(id), `${f}: unknown topic ${id}`);
+  }
+});
+
+test('every record of how a review was made reads cleanly and belongs to a review', () => {
+  for (const f of fs.readdirSync('content/reviews').filter((name) => name.endsWith('.process.json'))) {
+    assert.ok(fs.existsSync(`content/reviews/${f.replace(/\.process\.json$/, '.md')}`), `${f} has no review`);
+    const { problems } = parseProcess(JSON.parse(fs.readFileSync(`content/reviews/${f}`, 'utf8')));
+    assert.deepEqual(problems, [], f);
   }
 });

@@ -3,6 +3,7 @@ import { notFound } from 'next/navigation';
 import { getDoc, renderTemplate } from '@/lib/doc';
 import { site } from '@/lib/site';
 import { Markdown } from '@/components/Markdown';
+import { splitChangelog } from '@/lib/changes';
 import { GradeScheme } from '@/components/GradeScheme';
 import { getGradeScheme } from '@/lib/grades-store';
 import { Comments } from '@/components/Comments';
@@ -15,15 +16,6 @@ import { TableOfContents } from '@/components/TableOfContents';
  * The guide's changelog is long and only some readers want it, so it is split off and
  * shown folded. Everything from its "## Changelog" heading onward goes in the fold.
  */
-function splitChangelog(body: string): { main: string; changelog: string | null } {
-  const match = /^## Changelog[ \t]*$/m.exec(body);
-  if (!match) return { main: body, changelog: null };
-  return {
-    main: body.slice(0, match.index).trimEnd(),
-    changelog: body.slice(match.index + match[0].length).trim(),
-  };
-}
-
 export function generateMetadata(): Metadata {
   return { title: 'Methods', description: getSiteText()['methods.description'], alternates: { canonical: '/methods' } };
 }

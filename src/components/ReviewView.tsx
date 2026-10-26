@@ -17,6 +17,10 @@ import { getSiteText } from '@/lib/site-text';
 import { RichText } from '@/components/RichText';
 import { getTags } from '@/lib/tags-store';
 import { conditionTag, tagsOf } from '@/lib/tags';
+import { compareReviews, methodChangesSince, parseChangelog, splitChangelog } from '@/lib/changes';
+import { getDoc } from '@/lib/doc';
+import { ReviewChanges } from '@/components/ReviewChanges';
+import { OUTCOME_LABELS, SEVERITY_LABELS, factCheckSummary, readableCount, totalTokens } from '@/lib/process';
 
 /**
  * A review as readers see it. The public page and the admin draft preview both render this,
@@ -27,11 +31,34 @@ import { conditionTag, tagsOf } from '@/lib/tags';
 const CONTEXT_ID = 'further-context';
 const NOTES_ID = 'notes-for-the-guide';
 const READ_ID = 'what-claude-read';
+const PROCESS_ID = 'how-this-review-was-made';
+const FINDINGS_ID = 'fact-check-findings';
+const METHOD_ID = 'method-since';
+const CHANGES_ID = 'changes-since';
 
 export function ReviewView({ review, banner }: { review: Review; banner?: ReactNode }) {
   const text = getSiteText();
   const tagList = getTags();
   const read = readList(review);
+  const record = review.process;
+  // What changed after Claude handed the review over, and in the method since it was written.
+  const changes = record?.original
+    ? compareReviews(record.original, {
+        score: review.score,
+        signal: review.signal,
+        verdict: review.verdict,
+        strengths: review.strengths ?? [],
+        weaknesses: review.weaknesses ?? [],
+        body: review.body,
+      })
+    : null;
+  const changeCount = changes ? changes.fields.length + changes.paragraphs.length + (record?.changes?.length ?? 0) : 0;
+  const guide = getDoc('guide');
+  const methodSince =
+    review.guideVersion && guide
+      ? methodChangesSince(review.guideVersion, parseChangelog(splitChangelog(guide.body).changelog ?? ''))
+      : [];
+  const repo = process.env.GITHUB_REPO;
   const own = tagsOf(review, tagList);
   const conditions = (review.conditions ?? []).map((name) => ({ name, tag: conditionTag(name, tagList) }));
   const link = paperLink(review);
@@ -42,7 +69,7 @@ export function ReviewView({ review, banner }: { review: Review; banner?: ReactN
     ...extractToc(body),
     ...(review.context?.length ? [{ id: CONTEXT_ID, text: text['review.contextHeading'] }] : []),
     ...(review.guideNotes?.length ? [{ id: NOTES_ID, text: text['review.guideNotesHeading'] }] : []),
-    { id: READ_ID, text: text['label.access'] },
+    { id: PROCESS_ID, text: text['review.processHeading'] },
   ];
   const reviewedOn = new Date(`${review.reviewedOn}T00:00:00Z`).toLocaleDateString('en-GB', {
     day: 'numeric',
@@ -232,12 +259,60 @@ export function ReviewView({ review, banner }: { review: Review; banner?: ReactN
           </details>
         )}
 
-        <aside className="provenance">
+        <aside className="provenance" id={PROCESS_ID}>
+          <h2 className="provenance-title">{text['review.processHeading']}</h2>
           <p>
             Written by {modelLabel(review, 'an unrecorded Claude model')} against{' '}
             <Link href="/methods">the guide</Link>
             {review.guideVersion ? ` (v${review.guideVersion})` : ''}.{' '}
             <RichText text={text['review.provenance']} inline />
+          </p>
+          {methodSince.length > 0 && (
+            <details className="sources-details" id={METHOD_ID}>
+              <summary>
+                {text['review.methodSince']} ({methodSince.length}, now v{guide?.version})
+              </summary>
+              <ul>
+                {methodSince.map((entry) => (
+                  <li key={entry.version}>
+                    <strong>{entry.version}</strong> ({entry.date}): {entry.text}
+                  </li>
+                ))}
+              </ul>
+            </details>
+          )}
+          {record?.commit && (
+            <p className="process-line">
+              {text['review.commitLabel']}:{' '}
+              {repo ? (
+                <a href={`https://github.com/${repo}/blob/${record.commit}/.claude/skills/review/SKILL.md`} target="_blank" rel="noreferrer">
+                  <code>{record.commit.slice(0, 7)}</code>
+                </a>
+              ) : (
+                <code>{record.commit.slice(0, 7)}</code>
+              )}
+            </p>
+          )}
+          {changes && changeCount === 0 && <p className="process-line">{text['review.unchanged']}</p>}
+          {changes && changeCount > 0 && (
+            <details className="sources-details" id={CHANGES_ID}>
+              <summary>
+                {text['review.changesSummary']} ({changeCount})
+              </summary>
+              <ReviewChanges changes={changes} log={record?.changes ?? []} />
+            </details>
+          )}
+          {record?.tokens && (
+            <p className="process-line">
+              <abbr title="Units of text the model processed. Most are the same material read again from a cache.">
+                {readableCount(totalTokens(record.tokens))} tokens
+              </abbr>
+              {record.session?.minutes ? ` over ${record.session.minutes} active minutes` : ''}.
+            </p>
+          )}
+          <p className="process-line">
+            {text['review.factCheckLabel']}:{' '}
+            {record?.factCheck ? factCheckSummary(record.factCheck.findings) : text['access.unrecorded']}
           </p>
           {/* Kept out of the header: there for anyone checking the review, not needed to read it. */}
           <details className="sources-details" id={READ_ID}>
@@ -255,6 +330,41 @@ export function ReviewView({ review, banner }: { review: Review; banner?: ReactN
               </ul>
             )}
           </details>
+          {record?.factCheck && record.factCheck.findings.length > 0 && (
+            <details className="sources-details findings" id={FINDINGS_ID}>
+              <summary>
+                {text['review.findingsSummary']} ({record.factCheck.findings.length})
+              </summary>
+              <RichText text={text['review.factCheckIntro']} />
+              <ol>
+                {record.factCheck.findings.map((finding, index) => (
+                  <li key={index}>
+                    <p className="finding-tags">
+                      <span className={`finding-severity ${finding.severity}`}>{SEVERITY_LABELS[finding.severity]}</span>
+                      <span className={`finding-outcome ${finding.outcome}`}>{OUTCOME_LABELS[finding.outcome]}</span>
+                    </p>
+                    <p>
+                      <em>The review said:</em> “{finding.claim}”
+                    </p>
+                    <p>
+                      <em>The fact check:</em> {finding.issue}
+                    </p>
+                    {finding.source && (
+                      <p>
+                        <em>The source:</em> “{finding.source}”
+                      </p>
+                    )}
+                    {finding.response && (
+                      <p>
+                        <em>{finding.outcome === 'disputed' ? 'Why it was not changed:' : 'What was and was not changed:'}</em>{' '}
+                        {finding.response}
+                      </p>
+                    )}
+                  </li>
+                ))}
+              </ol>
+            </details>
+          )}
         </aside>
         </div>
       </div>
