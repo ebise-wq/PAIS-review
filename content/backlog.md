@@ -20,6 +20,7 @@ in /admin → Backlog. Longer write-ups live in `docs/roadmap.md`. Not shown on 
 - [ ] [low] Which model wrote a review rests on its frontmatter; nothing verifies it.
 - [ ] [low] The abbreviation check is a rough heuristic: an unusual name can be flagged, and an abbreviation followed by a word like "study" can slip through.
 - [x] Reviews write the grade before the analysis, so the analysis can become justification for an early number. Fixed by grade last, shown first, in methods 0.8. It was first ticked on 2026-10-14 when only the roadmap write-up existed. (done 2026-10-16)
+- [ ] [low] Next.js 15 bundles an old PostCSS with published flaws (fixed only in Next.js 16). They need CSS written by outsiders, which this site never processes, so the risk is low; upgrading to Next.js 16 is a larger change with breaking updates.
 
 ## Missing features
 

@@ -16,7 +16,7 @@
     "@anthropic-ai/sdk": "^0.126.0",
     "diff": "8.0.4",
     "gray-matter": "^4.0.3",
-    "next": "^15.5.4",
+    "next": "^15.5.28",
     "pg": "^8.23.0",
     "react": "^19.1.1",
     "react-dom": "^19.1.1",
@@ -25,7 +25,7 @@
     "zod": "^4.6.5"
   },
   "devDependencies": {
-    "@types/node": "^22.10.2",
+    "@types/node": "20.17.6",
     "@types/pg": "^8.23.1",
     "@types/react": "^19.1.9",
     "@types/react-dom": "^19.1.7",
