@@ -65,11 +65,13 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
 
         <GradeSchemeDialog bands={getGradeScheme()} title={text['methods.gradesSummary']} />
 
-        <footer className="site-footer">
-          <div className="wrap">
-            <RichText text={text['site.footer']} />
-          </div>
-        </footer>
+        {text['site.footer'].trim() && (
+          <footer className="site-footer">
+            <div className="wrap">
+              <RichText text={text['site.footer']} />
+            </div>
+          </footer>
+        )}
       </body>
     </html>
   );

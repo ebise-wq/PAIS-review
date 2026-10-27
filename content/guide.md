@@ -1,6 +1,6 @@
 ---
 title: Guide to peer review in post-acute infection syndromes
-version: "0.8.7"
+version: "0.9"
 updated: 2026-10-27
 authors: The editor (main), Claude
 
@@ -215,6 +215,14 @@ Could hypovolemia affect the comparability of blood levels?
 
 ## Changelog
 
+- **0.9** (2026-10-27) — Instructions and the review skill merged: every rule for what a
+  review says and how it is written now lives in the instructions, which the Claude Code
+  review skill and the claude.ai prompt both point to. The skill keeps only its own steps:
+  saving sources, the blind fact check, recording the process, saving the draft. Where the
+  two differed, the instructions were kept, with additions from the skill: checking claims
+  against primary sources, what the verdict and the strengths and weaknesses must do,
+  recording model and effort, what some body sections cover, and that the executive summary
+  writes terms out again. The prompt is now one line pointing to the instructions.
 - **0.8.7** (2026-10-27) — Review skill: removed an older line that allowed a review from
   the abstract alone, which contradicted the rule added in 0.8.4. No criteria changed.
 - **0.8.6** (2026-10-25) — Grades run from 1 to 10 instead of 0 to 10: the lowest band is

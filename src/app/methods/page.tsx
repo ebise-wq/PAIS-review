@@ -23,7 +23,6 @@ export function generateMetadata(): Metadata {
 export default function MethodsPage() {
   const methods = getDoc('methods');
   const guide = getDoc('guide');
-  const prompt = getDoc('prompt');
   if (!methods || !guide) notFound();
   const text = getSiteText();
   const methodsBody = renderTemplate(methods.body, site.url);
@@ -36,9 +35,8 @@ export default function MethodsPage() {
   // The same contents list as a review page, built from everything on this page in order.
   const toc: TocEntry[] = [
     ...extractToc(methodsBody),
-    ...(skill ? [{ id: 'review-skill', text: text['methods.skillSummary'] }] : []),
     ...(instructions ? [{ id: 'instructions', text: text['methods.instructionsSummary'] }] : []),
-    ...(prompt ? [{ id: 'prompt', text: text['methods.promptSummary'] }] : []),
+    ...(skill ? [{ id: 'review-skill', text: text['methods.skillSummary'] }] : []),
     ...(grades.length ? [{ id: 'grade-scheme', text: text['methods.gradesSummary'] }] : []),
     ...extractToc(guideBody),
     ...(changelog ? [{ id: 'changelog', text: 'Changelog' }] : []),
@@ -67,8 +65,20 @@ export default function MethodsPage() {
         <div className="toc-main">
       <Markdown>{methodsBody}</Markdown>
 
-      {/* Everything Claude is told, in full: the skill reviews are written with, the longer
-          instructions a claude.ai project follows, and the short prompt that starts one. */}
+      {/* Everything Claude is told, in full: the instructions every review follows, and the
+          extra steps for writing one straight into the site in Claude Code. */}
+
+      {instructions && (
+        <details className="prompt-details doc-fold" id="instructions">
+          <summary>{text['methods.instructionsSummary']}</summary>
+          <Markdown idPrefix="instructions-">{renderTemplate(instructions.body, site.url)}</Markdown>
+          <p className="hint">
+            As a file: <a href="/instructions.md">/instructions.md</a>. A claude.ai project starts from{' '}
+            <a href="/prompt.md">/prompt.md</a>, which points here.
+          </p>
+        </details>
+      )}
+
       {skill && (
         <details className="prompt-details doc-fold" id="review-skill">
           <summary>{text['methods.skillSummary']}</summary>
@@ -79,27 +89,6 @@ export default function MethodsPage() {
         </details>
       )}
 
-      {instructions && (
-        <details className="prompt-details doc-fold" id="instructions">
-          <summary>{text['methods.instructionsSummary']}</summary>
-          <Markdown idPrefix="instructions-">{renderTemplate(instructions.body, site.url)}</Markdown>
-          <p className="hint">
-            As a file: <a href="/instructions.md">/instructions.md</a>
-          </p>
-        </details>
-      )}
-
-      {prompt && (
-        <details className="prompt-details" id="prompt">
-          <summary>{text['methods.promptSummary']}</summary>
-          <pre className="prompt-block">
-            <code>{renderTemplate(prompt.body, site.url)}</code>
-          </pre>
-          <p className="hint">
-            As files: <a href="/prompt.md">/prompt.md</a>, and the guide below as <a href="/guide.md">/guide.md</a>.
-          </p>
-        </details>
-      )}
 
       {grades.length > 0 && (
         <details className="prompt-details" id="grade-scheme">

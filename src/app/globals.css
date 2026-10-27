@@ -110,9 +110,11 @@ a:hover { text-decoration-thickness: 2px; }
   white-space: pre-wrap; word-break: break-word; font-size: 0.88rem; line-height: 1.55;
 }
 
+/* The page keeps room at the bottom whether or not there is a footer. */
+main.wrap { padding-bottom: 64px; }
 .site-footer {
   border-top: 1px solid var(--border);
-  margin-top: 64px; padding: 28px 0 44px;
+  padding: 28px 0 44px;
   color: var(--muted); font-size: 0.85rem;
 }
 .site-footer p { margin: 0 0 8px; max-width: 46rem; }
