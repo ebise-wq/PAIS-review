@@ -13,11 +13,13 @@ if (process.env.CI && !local) throw new Error('TEST_DATABASE_URL must name a loc
 
 let lib;
 let db;
+let backup;
 if (local) {
   // The site takes any Postgres URL it finds; leave it only this one.
   for (const name of Object.keys(process.env)) if (/^postgres/i.test(process.env[name] ?? '')) delete process.env[name];
   process.env.DATABASE_URL = url;
   lib = await import('../src/lib/comments.ts');
+  backup = await import('../src/lib/backup.ts');
   db = await import('../src/lib/db.ts');
 }
 
@@ -173,4 +175,43 @@ test('retracting and resolving can be undone, and the thread markdown says so', 
   [comment] = await lib.listComments('review', target, null);
   assert.equal(comment.retracted, false);
   assert.equal(comment.resolved, false);
+});
+
+test('a removed comment and its replies are kept aside, with their votes', { skip }, async () => {
+  const target = slug();
+  const root = await post(target);
+  await post(target, { parentId: root, voter: 'voter-b' });
+  await lib.vote(root, 'voter-c', 'heart', 1);
+  await lib.deleteComment(root);
+  const kept = await db.query(
+    `select data from comments_removed where data->'comment'->>'target_slug' = $1 order by comment_id`,
+    [target],
+  );
+  assert.equal(kept.length, 2);
+  assert.equal(kept[0].data.votes.length, 2); // the author's own upvote and the heart
+});
+
+test('a backup puts back what was lost, and leaves what is still there alone', { skip }, async () => {
+  const target = slug();
+  const root = await post(target, { body: 'Worth keeping' });
+  await post(target, { parentId: root, voter: 'voter-b', body: 'A reply worth keeping' });
+  await lib.editComment(root, 'Worth keeping, edited');
+  await lib.setRating(target, 'voter-a', 4);
+  const saved = JSON.parse(JSON.stringify(await backup.exportAll())); // as the downloaded file
+
+  await db.query(`delete from comments where target_slug = $1`, [target]);
+  await db.query(`delete from ratings where review_slug = $1`, [target]);
+  const added = await backup.restoreAll(saved);
+  assert.ok(added.comments >= 2 && added.ratings >= 1 && added.comment_edits >= 1);
+
+  const [comment] = await lib.listComments('review', target, 'voter-a');
+  assert.equal(comment.body, 'Worth keeping, edited');
+  assert.equal(comment.replies[0].body, 'A reply worth keeping');
+  assert.equal(comment.karma, 1);
+  assert.deepEqual(await lib.commentHistory(root).then((h) => h.map((e) => e.body)), ['Worth keeping']);
+  assert.equal((await lib.getRating(target, 'voter-a')).mine, 4);
+
+  const again = await backup.restoreAll(saved);
+  assert.ok(Object.values(again).every((n) => n === 0));
+  assert.ok((await post(target)) > root); // new comments get fresh ids
 });

@@ -128,6 +128,12 @@ export function AdminPanel() {
         </button>
       </div>
       <p>Anything published here is committed to the repository, which redeploys the site.</p>
+      <p className="hint">
+        {/* A plain link: the browser saves the file itself. */}
+        <a href="/api/admin/backup" download>
+          Download a backup of comments and ratings
+        </a>
+      </p>
 
       <div className="tabs" role="tablist">
         {TABS.map(({ id, label }) => (

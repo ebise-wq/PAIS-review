@@ -10,6 +10,7 @@
     "typecheck": "tsc --noEmit",
     "check:abbreviations": "node scripts/check-abbreviations.mjs",
     "session-stats": "node --import tsx scripts/session-stats.mjs",
+    "restore-backup": "node --import tsx scripts/restore-backup.mjs",
     "test": "node --import tsx --test tests/*.test.mjs"
   },
   "dependencies": {
