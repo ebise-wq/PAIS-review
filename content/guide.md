@@ -1,7 +1,7 @@
 ---
 title: Guide to peer review in post-acute infection syndromes
-version: "0.8.6"
-updated: 2026-10-25
+version: "0.8.7"
+updated: 2026-10-27
 authors: The editor (main), Claude
 
 ---
@@ -215,6 +215,8 @@ Could hypovolemia affect the comparability of blood levels?
 
 ## Changelog
 
+- **0.8.7** (2026-10-27) — Review skill: removed an older line that allowed a review from
+  the abstract alone, which contradicted the rule added in 0.8.4. No criteria changed.
 - **0.8.6** (2026-10-25) — Grades run from 1 to 10 instead of 0 to 10: the lowest band is
   now 1–2.9. No other band changed.
 - **0.8.5** (2026-10-24) — Instructions: every figure in the main text is viewed as an

@@ -982,3 +982,11 @@ a[href$='#grade-scheme'] { text-decoration-style: dotted; text-underline-offset:
 .filter-toggle[aria-expanded='true'] { background: var(--surface-2); }
 .filter-panel { flex-basis: 100%; display: flex; flex-wrap: wrap; gap: 10px; align-items: center; }
 .filter-panel.inline { display: contents; }
+
+/* Methods: the review skill and the full instructions, folded, read as documents. */
+.doc-fold > .prose { margin-top: 12px; padding: 4px 16px 8px; border-left: 2px solid var(--border-strong); font-size: 0.95rem; }
+.doc-fold > .prose h1 { font-size: 1.15rem; }
+.doc-fold > .prose h2 { font-size: 1.05rem; }
+.doc-fold > .prose h3 { font-size: 0.95rem; }
+.doc-fold > .prose pre { overflow-x: auto; }
+#review-skill, #instructions { scroll-margin-top: 72px; }

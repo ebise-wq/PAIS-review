@@ -156,6 +156,8 @@ export const FIELDS = {
 
   // ---- methods and about
   'methods.gradesSummary': line('Grade scheme heading', 'Fold on the Methods page, and title of the pop-up a link to /methods#grade-scheme opens.', 'Grade scheme', 60),
+  'methods.skillSummary': line('Review skill expander', 'Methods page fold with the Claude Code skill reviews are written with.', 'The review skill (Claude Code), in full', 80),
+  'methods.instructionsSummary': line('Instructions expander', 'Methods page fold with the full instructions a claude.ai project follows.', 'The full instructions (claude.ai project)', 80),
   'methods.promptSummary': line('Prompt expander', 'The fold-out on the Methods page that shows the prompt.', 'The prompt, word for word', 60),
   'methods.description': text(
     'Methods page description',
@@ -182,7 +184,7 @@ export const GROUPS: { title: string; open: boolean; keys: SiteTextKey[] }[] = [
   { title: 'Review page: detail labels', open: false, keys: ['label.type', 'label.confidence', 'label.importance', 'label.reviewed', 'label.writtenBy', 'label.guideVersion', 'label.humanInput', 'review.processHeading', 'review.methodSince', 'review.commitLabel', 'review.changesSummary', 'review.unchanged', 'review.factCheckLabel', 'review.findingsSummary', 'review.factCheckIntro', 'label.access', 'label.preprint', 'access.unrecorded', 'review.detailsSummary'] },
   { title: 'Human input levels', open: false, keys: ['humanInput.none', 'humanInput.minor', 'humanInput.moderate', 'humanInput.major', 'humanInput.unrecorded'] },
   { title: 'Ratings, comments and AI discussion', open: false, keys: ['rating.label', 'discuss.label', 'discuss.prompt'] },
-  { title: 'Methods and About', open: false, keys: ['methods.promptSummary', 'methods.gradesSummary', 'methods.description', 'about.description'] },
+  { title: 'Methods and About', open: false, keys: ['methods.skillSummary', 'methods.instructionsSummary', 'methods.promptSummary', 'methods.gradesSummary', 'methods.description', 'about.description'] },
 ];
 
 export const KEYS = Object.keys(FIELDS) as SiteTextKey[];

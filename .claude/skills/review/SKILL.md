@@ -18,8 +18,8 @@ A short review of a sound paper is a correct outcome.
 ## Before writing
 
 1. Read `content/guide.md`.
-2. Read the paper properly. If you only have the abstract, say so at the top of the review and
-   set `confidence: low` — an abstract cannot be reviewed as if it were a paper.
+2. Read the paper properly. If you only have the abstract, stop and ask for the full text, as
+   the access rule below says; do not write the review.
 3. Check whether a review of this paper already exists in `content/reviews/`.
 4. Where it matters, verify claims against primary sources: trial registry entries for
    pre-registration and outcome switching, the supplement for methods the main text skips,
