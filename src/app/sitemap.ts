@@ -12,6 +12,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
     { url: site.url, lastModified: latest ? new Date(latest) : new Date(), priority: 1 },
     { url: `${site.url}/methods`, priority: 0.8 },
     { url: `${site.url}/about`, priority: 0.5 },
+    { url: `${site.url}/literature`, priority: 0.5 },
     ...reviews.map((review) => ({
       url: `${site.url}/reviews/${review.slug}`,
       lastModified: new Date(review.reviewedOn),
