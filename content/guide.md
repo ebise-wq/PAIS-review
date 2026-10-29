@@ -1,7 +1,7 @@
 ---
 title: Guide to peer review in post-acute infection syndromes
-version: "0.9"
-updated: 2026-10-27
+version: "0.10"
+updated: 2026-10-29
 authors: The editor (main), Claude
 
 ---
@@ -138,6 +138,20 @@ target has not tested the hypothesis, and should not be cited as though it had. 
 result, missing engagement evidence does not undo the effect, but it does mean the stated
 mechanism is unsupported: the drug may have worked through something else.
 
+### Participants with mast cell activation syndrome (MCAS)
+
+People with mast cell activation syndrome (MCAS) can react to many substances, including the
+inactive ingredients of a tablet or infusion (fillers, dyes, preservatives), and their symptoms
+can flare for reasons unrelated to the trial. In a trial this can:
+
+- Distort adverse events: reactions and flares not caused by the drug get recorded as side
+  effects, in the placebo arm too if it shares the inactive ingredients.
+- Probably raise drop-out, which may then differ between arms.
+
+Check whether people with MCAS or known drug sensitivities were excluded or counted; whether
+adverse events and drop-outs are reported per arm, and for this group where it is large;
+and whether the drug and the placebo share their inactive ingredients.
+
 ### Data collection
 
 Measuring PEM status at each data collection point is essential. In ME/CFS, the state of the
@@ -215,6 +229,9 @@ Could hypovolemia affect the comparability of blood levels?
 
 ## Changelog
 
+- **0.10** (2026-10-29) — Trials: participants with mast cell activation syndrome (MCAS) can
+  distort adverse events, with reactions and flares not caused by the drug, and may drop out
+  more; check exclusion, per-arm reporting and shared inactive ingredients.
 - **0.9** (2026-10-27) — Instructions and the review skill merged: every rule for what a
   review says and how it is written now lives in the instructions, which the Claude Code
   review skill and the claude.ai prompt both point to. The skill keeps only its own steps:
