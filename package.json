@@ -12,7 +12,8 @@
     "session-stats": "node --import tsx scripts/session-stats.mjs",
     "restore-backup": "node --import tsx scripts/restore-backup.mjs",
     "test": "node --import tsx --test tests/*.test.mjs",
-    "fetch-sources": "NODE_USE_ENV_PROXY=1 node --disable-warning=UNDICI-EHPA --import tsx scripts/fetch-sources.mjs"
+    "fetch-sources": "NODE_USE_ENV_PROXY=1 node --disable-warning=UNDICI-EHPA --import tsx scripts/fetch-sources.mjs",
+    "catalogue-sync": "NODE_USE_ENV_PROXY=1 node --disable-warning=UNDICI-EHPA --import tsx scripts/catalogue-sync.mjs"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.126.0",

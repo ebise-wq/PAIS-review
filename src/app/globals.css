@@ -992,3 +992,12 @@ a[href$='#grade-scheme'] { text-decoration-style: dotted; text-underline-offset:
 .doc-fold > .prose h3 { font-size: 0.95rem; }
 .doc-fold > .prose pre { overflow-x: auto; }
 #review-skill, #instructions { scroll-margin-top: 72px; }
+
+/* Admin: paper catalogue */
+.catalogue-stats { display: grid; grid-template-columns: repeat(auto-fill, minmax(130px, 1fr)); gap: 8px; margin: 12px 0; }
+.catalogue-stats div { border: 1px solid var(--border); border-radius: var(--radius); padding: 8px 10px; background: var(--surface); }
+.catalogue-stats dt { font-size: 0.75rem; color: var(--muted); }
+.catalogue-stats dd { margin: 2px 0 0; font-size: 1.1rem; font-weight: 600; }
+.catalogue-top { padding-left: 22px; }
+.catalogue-top li { margin-bottom: 8px; font-size: 0.92rem; }
+.catalogue-meta { color: var(--muted); }

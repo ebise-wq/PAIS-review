@@ -6,12 +6,14 @@ import { DocEditor } from './DocEditor';
 import { BacklogPanel } from './BacklogPanel';
 import { ReviewManager } from './ReviewManager';
 import { TagsPanel } from './TagsPanel';
+import { CataloguePanel } from './CataloguePanel';
 
 const TABS = [
   { id: 'review', label: 'Publish a review' },
   { id: 'page', label: 'Edit a page' },
   { id: 'manage', label: 'Reviews' },
   { id: 'tags', label: 'Tags' },
+  { id: 'catalogue', label: 'Catalogue' },
   { id: 'backlog', label: 'Backlog' },
 ] as const;
 
@@ -154,6 +156,7 @@ export function AdminPanel() {
       {tab === 'page' && <DocEditor onExpired={() => setSignedIn(false)} />}
       {tab === 'manage' && <ReviewManager onExpired={() => setSignedIn(false)} />}
       {tab === 'tags' && <TagsPanel onExpired={() => setSignedIn(false)} />}
+      {tab === 'catalogue' && <CataloguePanel onExpired={() => setSignedIn(false)} />}
       {tab === 'backlog' && <BacklogPanel onExpired={() => setSignedIn(false)} />}
     </div>
   );

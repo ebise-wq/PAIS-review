@@ -1,4 +1,5 @@
 import { Pool, type QueryResultRow } from 'pg';
+import { CATALOGUE_SCHEMA } from './catalogue-schema';
 
 /**
  * One Postgres pool per server instance. Vercel's storage integrations set the connection
@@ -135,7 +136,7 @@ let schemaReady: Promise<void> | undefined;
 export function ensureSchema(): Promise<void> {
   if (!schemaReady) {
     schemaReady = getPool()
-      .query(SCHEMA)
+      .query(SCHEMA + CATALOGUE_SCHEMA)
       .then(() => undefined)
       .catch((error) => {
         schemaReady = undefined;
