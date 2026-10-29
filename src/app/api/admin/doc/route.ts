@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
 import matter from 'gray-matter';
-import { getDoc, getDocSource, withChangelogEntry, withGuideVersion } from '@/lib/doc';
+import { SKILL_PATH, getDoc, getDocSource, getSkill, withChangelogEntry, withGuideVersion } from '@/lib/doc';
 import { isSignedIn } from '@/lib/session';
 import { GithubError, getFile, getFileSha, getGithubConfig, putFile } from '@/lib/github';
 import { bumpVersion, isChangeKind, validateNote } from '@/lib/version';
@@ -9,15 +9,25 @@ export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 
 /** Standalone pages editable from /admin. Reviews go through /api/admin/publish instead. */
-const EDITABLE_PAGES = new Set(['about', 'methods', 'guide', 'instructions', 'backlog']);
+const EDITABLE_PAGES = new Set(['about', 'methods', 'guide', 'instructions', 'skill', 'backlog']);
+
+/** Where each page lives in the repository. The review skill sits where Claude Code looks for it. */
+function pathOf(name: string): string {
+  return name === 'skill' ? SKILL_PATH : `content/${name}.md`;
+}
+
+/** The deployed copy, for when the repository cannot be read. */
+function localSource(name: string): string | undefined {
+  return name === 'skill' ? getSkill()?.source : getDocSource(name);
+}
 
 /**
- * The three documents that together are "the method". They share one version number,
+ * The documents that together are "the method". They share one version number,
  * kept in the guide's frontmatter, and a change to any of them must bump it — reviews
  * record which version they were written under, and an unbumped edit makes older reviews
  * look like they met the current standard.
  */
-const VERSIONED_PAGES = new Set(['guide', 'instructions']);
+const VERSIONED_PAGES = new Set(['guide', 'instructions', 'skill']);
 
 function fail(message: string, status: number) {
   return NextResponse.json({ error: message }, { status });
@@ -31,13 +41,13 @@ export async function GET(request: Request) {
   // From the repository when publishing is set up: a page saved a minute ago then shows its
   // new text rather than the copy from before the rebuild, and the sha lets the save refuse
   // to overwrite a version this tab has not seen.
-  let content = getDocSource(name);
+  let content = localSource(name);
   let sha: string | null = null;
   let guideVersion = getDoc('guide')?.version ?? null;
   const github = getGithubConfig();
   if (github) {
     try {
-      const file = await getFile(github, `content/${name}.md`);
+      const file = await getFile(github, pathOf(name));
       if (file) {
         content = file.content;
         sha = file.sha;
@@ -51,7 +61,7 @@ export async function GET(request: Request) {
       // Fall back to the deployed copy; the save still checks for conflicts.
     }
   }
-  if (content === undefined) return fail(`content/${name}.md does not exist.`, 404);
+  if (content === undefined) return fail(`${pathOf(name)} does not exist.`, 404);
 
   return NextResponse.json({
     name,
@@ -86,6 +96,19 @@ export async function POST(request: Request) {
   const content = (input.content ?? '').trim();
   if (!content.startsWith('---')) {
     return fail('The page must keep its --- frontmatter block at the top.', 400);
+  }
+
+  // Claude Code finds the skill by the name and description in its frontmatter.
+  if (name === 'skill') {
+    let data: Record<string, unknown> = {};
+    try {
+      data = matter(content).data as Record<string, unknown>;
+    } catch {
+      return fail('The frontmatter is not valid YAML.', 400);
+    }
+    if (data.name !== 'review' || typeof data.description !== 'string' || !data.description.trim()) {
+      return fail('Keep "name: review" and the description in the frontmatter: Claude Code uses them to find the skill.', 400);
+    }
   }
 
   const today = new Date().toISOString().slice(0, 10);
@@ -152,7 +175,7 @@ export async function POST(request: Request) {
     return fail(error instanceof Error ? error.message : 'Could not prepare the save.', 400);
   }
 
-  const path = `content/${name}.md`;
+  const path = pathOf(name);
 
   try {
     // The sha the editor loaded, so a save from an out-of-date tab is refused rather than

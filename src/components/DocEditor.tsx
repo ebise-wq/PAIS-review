@@ -13,6 +13,7 @@ const PAGES = [
   { value: 'methods', label: 'Methods page' },
   { value: 'guide', label: 'Review guide' },
   { value: 'instructions', label: 'Reviewing instructions' },
+  { value: 'skill', label: 'Review skill (Claude Code steps)' },
   { value: 'backlog', label: 'Backlog (admin only)' },
 ];
 
@@ -167,8 +168,8 @@ export function DocEditor({ onExpired }: { onExpired: () => void }) {
 
       {versioned && (
         <p className="hint warn">
-          This page is part of the versioned method — the guide and the reviewing instructions
-          share one number, currently v{currentVersion ?? '?'}. Saving either of them bumps it and writes your note into the guide&rsquo;s changelog, so there is
+          This page is part of the versioned method — the guide, the reviewing instructions and the
+          review skill share one number, currently v{currentVersion ?? '?'}. Saving any of them bumps it and writes your note into the guide&rsquo;s changelog, so there is
           nothing to edit by hand afterwards.
         </p>
       )}
@@ -188,9 +189,11 @@ export function DocEditor({ onExpired }: { onExpired: () => void }) {
             ? 'Loading the current content…'
             : name === 'guide'
               ? 'Markdown. Leave version and updated in the frontmatter alone — both are set for you on save.'
-              : name === 'instructions' || name === 'methods'
+              : name === 'methods'
                 ? 'Markdown. {{GUIDE_VERSION}} and {{SITE_URL}} are filled in when served — never hard-code them.'
-                : 'Markdown, including the frontmatter block at the top.'}
+                : name === 'skill'
+                  ? 'Markdown. Keep name and description in the frontmatter: Claude Code uses them to find the skill.'
+                  : 'Markdown, including the frontmatter block at the top.'}
         </p>
       </div>
 
