@@ -26,6 +26,7 @@ in /admin → Backlog. Longer write-ups live in `docs/roadmap.md`. Not shown on 
 
 - [ ] [high] A private archive of every review session’s full transcript (a private GitHub repository; the review skill pushes a compressed copy after each review), so any question about how reviews were made can be answered later. Roughly 1–5 MB per review. Needs the editor to create the repository and add it to the Claude Code environment. The same repository can take an automatic weekly backup of comments and ratings, which for now is a download link in admin.
 - [ ] [medium] Reviews and fact checks by different models (for example GPT or Gemini alongside Claude), each separately, to reduce shared blind spots. Show each model’s grade and how far they agree; a second opinion becomes the default, not an extra.
+- [ ] [medium] Once several AI reviewers run: one reviews without the guide. That limits the guide’s biasing effect, and comparing its reviews with guided ones shows what the guide adds: whether it catches more, and what kind. To measure the guide itself, compare the same model with and without it on the same paper; a different model without the guide changes two things at once.
 - [ ] [low] On hold: citations on the About page for how well models review. The editor writes text outside the reviews.
 - [ ] [medium] Bluesky posts when a review is published.
 - [ ] [medium] Weekly email digest that readers sign up for, with filters (condition, tag, type of review, score band). Needs the site to send email.
