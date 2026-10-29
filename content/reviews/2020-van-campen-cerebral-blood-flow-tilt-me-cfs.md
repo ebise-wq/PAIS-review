@@ -10,6 +10,7 @@ studyType: "Single-centre clinical cohort, n=429 patients and 44 healthy control
 design: case-control
 topics: ["heart-circulation", "brain-nerves", "diagnosis-biomarkers"]
 kind: paper
+draft: true
 reviewedOn: 2026-10-29
 guideVersion: "0.10.1"
 model: "claude-opus-5-5"
