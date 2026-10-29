@@ -1,6 +1,6 @@
 import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
-import { getDoc, renderTemplate } from '@/lib/doc';
+import { getDoc, getSkill, renderTemplate } from '@/lib/doc';
 import { site } from '@/lib/site';
 import { Markdown } from '@/components/Markdown';
 import { splitChangelog } from '@/lib/changes';
@@ -23,18 +23,20 @@ export function generateMetadata(): Metadata {
 export default function MethodsPage() {
   const methods = getDoc('methods');
   const guide = getDoc('guide');
-  const prompt = getDoc('prompt');
   if (!methods || !guide) notFound();
   const text = getSiteText();
   const methodsBody = renderTemplate(methods.body, site.url);
   const { main: guideBody, changelog } = splitChangelog(guide.body);
   const hasComments = dbConfigured();
   const grades = getGradeScheme();
+  const skill = getSkill();
+  const instructions = getDoc('instructions');
 
   // The same contents list as a review page, built from everything on this page in order.
   const toc: TocEntry[] = [
     ...extractToc(methodsBody),
-    ...(prompt ? [{ id: 'prompt', text: text['methods.promptSummary'] }] : []),
+    ...(instructions ? [{ id: 'instructions', text: text['methods.instructionsSummary'] }] : []),
+    ...(skill ? [{ id: 'review-skill', text: text['methods.skillSummary'] }] : []),
     ...(grades.length ? [{ id: 'grade-scheme', text: text['methods.gradesSummary'] }] : []),
     ...extractToc(guideBody),
     ...(changelog ? [{ id: 'changelog', text: 'Changelog' }] : []),
@@ -63,18 +65,29 @@ export default function MethodsPage() {
         <div className="toc-main">
       <Markdown>{methodsBody}</Markdown>
 
-      {prompt && (
-        <details className="prompt-details" id="prompt">
-          <summary>{text['methods.promptSummary']}</summary>
-          <pre className="prompt-block">
-            <code>{renderTemplate(prompt.body, site.url)}</code>
-          </pre>
+      {/* Everything Claude is told, in full: the instructions every review follows, and the
+          extra steps for writing one straight into the site in Claude Code. */}
+
+      {instructions && (
+        <details className="prompt-details doc-fold" id="instructions">
+          <summary>{text['methods.instructionsSummary']}</summary>
+          <Markdown idPrefix="instructions-">{renderTemplate(instructions.body, site.url)}</Markdown>
           <p className="hint">
-            Raw files: <a href="/prompt.md">/prompt.md</a>, <a href="/instructions.md">/instructions.md</a>,{' '}
-            <a href="/guide.md">/guide.md</a>.
+            As a file: <a href="/instructions.md">/instructions.md</a>
           </p>
         </details>
       )}
+
+      {skill && (
+        <details className="prompt-details doc-fold" id="review-skill">
+          <summary>{text['methods.skillSummary']}</summary>
+          <Markdown idPrefix="skill-">{skill.body}</Markdown>
+          <p className="hint">
+            As a file: <a href="/review-skill.md">/review-skill.md</a>
+          </p>
+        </details>
+      )}
+
 
       {grades.length > 0 && (
         <details className="prompt-details" id="grade-scheme">

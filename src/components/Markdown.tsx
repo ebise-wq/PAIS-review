@@ -39,7 +39,7 @@ function textOf(node: Element | undefined): string {
  * Reviews are trusted content, but raw HTML stays disabled anyway — react-markdown
  * ignores it unless rehype-raw is added, and it should not be.
  */
-export function Markdown({ children }: { children: string }) {
+export function Markdown({ children, idPrefix = '' }: { children: string; /** Keeps heading anchors apart when two documents share a page. */ idPrefix?: string }) {
   return (
     <div className="prose">
       <ReactMarkdown
@@ -53,7 +53,7 @@ export function Markdown({ children }: { children: string }) {
           p: ({ node, children: inner }: { node?: Element; children?: ReactNode }) =>
             isStandaloneBold(node) ? <h3 className="run-in">{inner}</h3> : <p>{inner}</p>,
           h2: ({ node, children: inner }: { node?: Element; children?: ReactNode }) => (
-            <h2 id={headingId(textOf(node))}>{inner}</h2>
+            <h2 id={idPrefix + headingId(textOf(node))}>{inner}</h2>
           ),
         }}
       >

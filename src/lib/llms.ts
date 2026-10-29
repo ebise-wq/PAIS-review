@@ -31,7 +31,6 @@ export function llmsTxt(input: {
     '',
     `- [Review guide](${url}/guide.md)`,
     `- [Instructions for writing a review](${url}/instructions.md)`,
-    `- [Prompt](${url}/prompt.md)`,
     '',
   ].join('\n');
 }

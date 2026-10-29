@@ -50,8 +50,9 @@ export const FIELDS = {
   ),
   'site.footer': md(
     'Footer',
-    'Bottom of every page. A blank line starts a new paragraph.',
+    'Bottom of every page. A blank line starts a new paragraph. Leave empty for no footer.',
     'Reviews are written by Claude against a published [method](/methods), then read and published by the editor. They are one considered opinion, not a journal decision or a consensus view, and they can be wrong.\n\nThink a review is wrong? Say so in the comments under it — that is where it gets argued out.',
+    { optional: true },
   ),
   'site.notFound': md('Page not found', 'Shown for a link to a page that does not exist.', 'There is no page here. [Back to the reviews](/).', { max: 300 }),
 
@@ -156,7 +157,8 @@ export const FIELDS = {
 
   // ---- methods and about
   'methods.gradesSummary': line('Grade scheme heading', 'Fold on the Methods page, and title of the pop-up a link to /methods#grade-scheme opens.', 'Grade scheme', 60),
-  'methods.promptSummary': line('Prompt expander', 'The fold-out on the Methods page that shows the prompt.', 'The prompt, word for word', 60),
+  'methods.instructionsSummary': line('Instructions expander', 'Methods page fold with the instructions every review follows.', 'The review instructions', 80),
+  'methods.skillSummary': line('Review skill expander', 'Methods page fold with the extra steps for writing a review in Claude Code.', 'The extra steps in Claude Code (review skill)', 80),
   'methods.description': text(
     'Methods page description',
     'Search results and link previews for the Methods page.',
@@ -182,7 +184,7 @@ export const GROUPS: { title: string; open: boolean; keys: SiteTextKey[] }[] = [
   { title: 'Review page: detail labels', open: false, keys: ['label.type', 'label.confidence', 'label.importance', 'label.reviewed', 'label.writtenBy', 'label.guideVersion', 'label.humanInput', 'review.processHeading', 'review.methodSince', 'review.commitLabel', 'review.changesSummary', 'review.unchanged', 'review.factCheckLabel', 'review.findingsSummary', 'review.factCheckIntro', 'label.access', 'label.preprint', 'access.unrecorded', 'review.detailsSummary'] },
   { title: 'Human input levels', open: false, keys: ['humanInput.none', 'humanInput.minor', 'humanInput.moderate', 'humanInput.major', 'humanInput.unrecorded'] },
   { title: 'Ratings, comments and AI discussion', open: false, keys: ['rating.label', 'discuss.label', 'discuss.prompt'] },
-  { title: 'Methods and About', open: false, keys: ['methods.promptSummary', 'methods.gradesSummary', 'methods.description', 'about.description'] },
+  { title: 'Methods and About', open: false, keys: ['methods.instructionsSummary', 'methods.skillSummary', 'methods.gradesSummary', 'methods.description', 'about.description'] },
 ];
 
 export const KEYS = Object.keys(FIELDS) as SiteTextKey[];

@@ -1,7 +1,7 @@
 ---
 title: Guide to peer review in post-acute infection syndromes
-version: "0.8.6"
-updated: 2026-10-25
+version: "0.10.1"
+updated: 2026-10-29
 authors: The editor (main), Claude
 
 ---
@@ -138,6 +138,20 @@ target has not tested the hypothesis, and should not be cited as though it had. 
 result, missing engagement evidence does not undo the effect, but it does mean the stated
 mechanism is unsupported: the drug may have worked through something else.
 
+### Participants with mast cell activation syndrome (MCAS)
+
+People with mast cell activation syndrome (MCAS) can react to many substances, including the
+inactive ingredients of a tablet or infusion (fillers, dyes, preservatives), and their symptoms
+can flare for reasons unrelated to the trial. In a trial this can:
+
+- Distort adverse events: reactions and flares not caused by the drug get recorded as side
+  effects, in the placebo arm too if it shares the inactive ingredients.
+- Probably raise drop-out, which may then differ between arms.
+
+Check whether people with MCAS or known drug sensitivities were excluded or counted; whether
+adverse events and drop-outs are reported per arm, and for this group where it is large;
+and whether the drug and the placebo share their inactive ingredients.
+
 ### Data collection
 
 Measuring PEM status at each data collection point is essential. In ME/CFS, the state of the
@@ -215,6 +229,24 @@ Could hypovolemia affect the comparability of blood levels?
 
 ## Changelog
 
+- **0.10.1** (2026-10-29) — Instructions: reviews are now written only in Claude Code, so
+  the claude.ai prompt and the section on reviewing in a chat are gone; the rules for
+  discussing a draft stay. Guide notes are for general-enough points. Removed the closing
+  line about not sneering and criticising evidence rather than people, which the rest
+  already covers. No criteria changed.
+- **0.10** (2026-10-29) — Trials: participants with mast cell activation syndrome (MCAS) can
+  distort adverse events, with reactions and flares not caused by the drug, and may drop out
+  more; check exclusion, per-arm reporting and shared inactive ingredients.
+- **0.9** (2026-10-27) — Instructions and the review skill merged: every rule for what a
+  review says and how it is written now lives in the instructions, which the Claude Code
+  review skill and the claude.ai prompt both point to. The skill keeps only its own steps:
+  saving sources, the blind fact check, recording the process, saving the draft. Where the
+  two differed, the instructions were kept, with additions from the skill: checking claims
+  against primary sources, what the verdict and the strengths and weaknesses must do,
+  recording model and effort, what some body sections cover, and that the executive summary
+  writes terms out again. The prompt is now one line pointing to the instructions.
+- **0.8.7** (2026-10-27) — Review skill: removed an older line that allowed a review from
+  the abstract alone, which contradicted the rule added in 0.8.4. No criteria changed.
 - **0.8.6** (2026-10-25) — Grades run from 1 to 10 instead of 0 to 10: the lowest band is
   now 1–2.9. No other band changed.
 - **0.8.5** (2026-10-24) — Instructions: every figure in the main text is viewed as an

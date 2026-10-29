@@ -114,3 +114,14 @@ export function withChangelogEntry(
   const rest = guideSource.slice(after).replace(/^\n+/, '');
   return `${guideSource.slice(0, after)}\n\n${entry}\n${rest}`;
 }
+
+/** Where the Claude Code review skill lives: the instructions reviews are now written with. */
+export const SKILL_PATH = '.claude/skills/review/SKILL.md';
+
+/** The review skill as a file (for /review-skill.md) and its text without the frontmatter (for the page). */
+export function getSkill(): { source: string; body: string } | undefined {
+  const file = path.join(process.cwd(), SKILL_PATH);
+  if (!fs.existsSync(file)) return undefined;
+  const source = fs.readFileSync(file, 'utf8');
+  return { source, body: matter(source).content.trim() };
+}
