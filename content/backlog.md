@@ -12,7 +12,7 @@ in /admin → Backlog. Longer write-ups live in `docs/roadmap.md`. Not shown on 
 - [x] [medium] Saving the About, Methods, instructions or prompt page from a tab opened before another save overwrites that save. Only the guide, site text and backlog check for this. (done 2026-10-19)
 - [ ] [medium] Human input is "Not recorded" on the reviews published before it existed. Set it in the Reviews tab.
 - [ ] [medium] No sources/citation management
-- [ ] [medium] The blind fact check only runs for reviews written with the `/review` skill in Claude Code. Reviews from the claude.ai project get none.
+- [x] [medium] The blind fact check only ran for reviews written with the review skill in Claude Code. Settled: reviews are now only written there. (done 2026-10-29)
 - [x] [low] Search covers the title, verdict, strengths and weaknesses, not the text of the review. (done 2026-10-19)
 - [ ] [low] Ratings are one per browser, so clearing cookies allows another vote.
 - [ ] [low] Spam defences stop bots and repeats, not a determined person.

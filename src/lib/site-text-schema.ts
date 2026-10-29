@@ -157,7 +157,7 @@ export const FIELDS = {
 
   // ---- methods and about
   'methods.gradesSummary': line('Grade scheme heading', 'Fold on the Methods page, and title of the pop-up a link to /methods#grade-scheme opens.', 'Grade scheme', 60),
-  'methods.instructionsSummary': line('Instructions expander', 'Methods page fold with the instructions every review follows.', 'The review instructions, in full', 80),
+  'methods.instructionsSummary': line('Instructions expander', 'Methods page fold with the instructions every review follows.', 'The review instructions', 80),
   'methods.skillSummary': line('Review skill expander', 'Methods page fold with the extra steps for writing a review in Claude Code.', 'The extra steps in Claude Code (review skill)', 80),
   'methods.description': text(
     'Methods page description',

@@ -73,8 +73,7 @@ export default function MethodsPage() {
           <summary>{text['methods.instructionsSummary']}</summary>
           <Markdown idPrefix="instructions-">{renderTemplate(instructions.body, site.url)}</Markdown>
           <p className="hint">
-            As a file: <a href="/instructions.md">/instructions.md</a>. A claude.ai project starts from{' '}
-            <a href="/prompt.md">/prompt.md</a>, which points here.
+            As a file: <a href="/instructions.md">/instructions.md</a>
           </p>
         </details>
       )}

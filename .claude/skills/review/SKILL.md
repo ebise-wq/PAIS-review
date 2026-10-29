@@ -13,12 +13,8 @@ frontmatter, kinds and grades, context, the body, abbreviations. This skill adds
 particular to writing a review straight into this site; where the two seem to differ, the
 instructions win.
 
-Two things in the instructions read differently here:
-
-- Where they say to fetch `{{SITE_URL}}/guide.md`, read `content/guide.md`. Where they say
-  `{{GUIDE_VERSION}}`, use the `version` in its frontmatter.
-- The section "In a conversation" is for claude.ai. Here, write straight into the file, in the
-  order the instructions give: the analysis, then the executive summary, then the frontmatter.
+Write straight into the file, in the order the instructions give: the analysis, then the
+executive summary, then the frontmatter.
 
 ## Before writing
 
@@ -32,11 +28,6 @@ Two things in the instructions read differently here:
 
 - File name: `content/reviews/<year>-<first-author-or-topic>-<short-descriptor>.md`, lowercase
   and hyphenated. For example `2024-lidocaine-hpbcd-post-covid.md`.
-- Tags: `conditions` are names, and `design` and `topics` are ids, from `content/tags.json`.
-- `effort`: in a Claude Code cloud session, call the `get_session` tool (claude-code-remote)
-  with no session ID and read `session_context.model` and `external_metadata.effort_level`. The
-  effort can change during a session, so read it when you write the frontmatter. The page shows
-  it as "claude-opus-5-5 (high effort)".
 - Abbreviations: `npm run check:abbreviations -- content/reviews/<file>.md` lists anything not
   written out at first use and any abbreviation in the frontmatter. It is a rough check; fix
   what it finds, or say what a name is where it is a name.

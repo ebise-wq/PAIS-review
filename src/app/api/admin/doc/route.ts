@@ -9,7 +9,7 @@ export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 
 /** Standalone pages editable from /admin. Reviews go through /api/admin/publish instead. */
-const EDITABLE_PAGES = new Set(['about', 'methods', 'guide', 'instructions', 'prompt', 'backlog']);
+const EDITABLE_PAGES = new Set(['about', 'methods', 'guide', 'instructions', 'backlog']);
 
 /**
  * The three documents that together are "the method". They share one version number,
@@ -17,7 +17,7 @@ const EDITABLE_PAGES = new Set(['about', 'methods', 'guide', 'instructions', 'pr
  * record which version they were written under, and an unbumped edit makes older reviews
  * look like they met the current standard.
  */
-const VERSIONED_PAGES = new Set(['guide', 'instructions', 'prompt']);
+const VERSIONED_PAGES = new Set(['guide', 'instructions']);
 
 function fail(message: string, status: number) {
   return NextResponse.json({ error: message }, { status });

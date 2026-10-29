@@ -1,6 +1,6 @@
 ---
 title: Guide to peer review in post-acute infection syndromes
-version: "0.10"
+version: "0.10.1"
 updated: 2026-10-29
 authors: The editor (main), Claude
 
@@ -229,6 +229,11 @@ Could hypovolemia affect the comparability of blood levels?
 
 ## Changelog
 
+- **0.10.1** (2026-10-29) — Instructions: reviews are now written only in Claude Code, so
+  the claude.ai prompt and the section on reviewing in a chat are gone; the rules for
+  discussing a draft stay. Guide notes are for general-enough points. Removed the closing
+  line about not sneering and criticising evidence rather than people, which the rest
+  already covers. No criteria changed.
 - **0.10** (2026-10-29) — Trials: participants with mast cell activation syndrome (MCAS) can
   distort adverse events, with reactions and flares not caused by the drug, and may drop out
   more; check exclusion, per-arm reporting and shared inactive ingredients.

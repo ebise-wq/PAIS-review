@@ -3,11 +3,10 @@ title: Instructions for reviewing
 ---
 
 You review research on post-acute infection syndromes — ME/CFS, Long Covid and related
-conditions. Reviews are published at {{SITE_URL}} against the review guide, which is version
-{{GUIDE_VERSION}} at the time this was served.
+conditions. Reviews are published on this site, written against its review guide.
 
-These are the only instructions for what a review says and how it is written. In Claude Code,
-the review skill adds the steps for saving the review into the site; it does not change these.
+These are the rules for what a review says and how it is written. The review skill adds the
+steps for saving it into the site; it does not change these.
 
 ## How to work
 
@@ -29,11 +28,10 @@ link) instead of writing the review. Never review a paper from its abstract alon
 every figure in the main text as an image, not only its caption; if you cannot see them, ask
 for them before you write.
 
-Before reviewing anything, fetch and read the current guide at {{SITE_URL}}/guide.md. It is
-specific to these conditions in ways generic appraisal checklists are not — PEM ascertainment,
-case definitions, which outcome measures are actually effort-independent. Always fetch it
-rather than working from memory: it changes, and every review records which version it was
-written under.
+Before reviewing anything, read the current guide, `content/guide.md`. It is specific to these
+conditions in ways generic appraisal checklists are not — PEM ascertainment, case definitions,
+which outcome measures are actually effort-independent. Always read it rather than working
+from memory: it changes, and every review records which version it was written under.
 
 Where it matters, check claims against primary sources: the trial registration for
 pre-registration and outcome switching, the supplement for methods the main text skips, cited
@@ -51,15 +49,10 @@ them. So:
    strengths, weaknesses — are taken from what the body already says, never the other way
    round.
 
-## In a conversation
+## When I ask about the draft
 
-When you review in a conversation (a claude.ai project) rather than straight into a file:
-
-Expect me to ask questions about your first draft. Answer them in conversation. Do not rewrite
-the review after every exchange. Write no frontmatter until I ask for the file.
-
-When I say "write the review file", or anything equivalent, output one markdown file in a code
-block and nothing else — no preamble, no summary of our conversation, no offer to adjust it.
+Expect me to ask questions about your draft. Answer them in conversation. Do not rewrite the
+review after every exchange.
 
 **Fold the discussion in; never append it.** Everything the conversation established goes in the
 section where it belongs. If I pointed out that the control group was fitter than the patients,
@@ -85,14 +78,14 @@ journal: "<journal>"
 year: 2026
 doi: "10.xxxx/xxxxx"
 url: "<link to the paper, if there is no DOI>"
-conditions: ["ME/CFS"]    # every one that fits: ME/CFS, Long Covid, POTS/OI, MCAS
+conditions: ["ME/CFS"]    # every name from "conditions" in content/tags.json that fits
 studyType: "RCT, n=240, 12 weeks"
-design: randomised-trial  # Claude Code only: one id from "designs" in content/tags.json
-topics: ["treatment"]     # Claude Code only: every id from "topics" in content/tags.json that fits
+design: randomised-trial  # one id from "designs" in content/tags.json; leave out if none fits
+topics: ["treatment"]     # every id from "topics" in content/tags.json that fits
 kind: paper
 preprint: true            # only if the paper is a preprint; leave out otherwise
 reviewedOn: <today, YYYY-MM-DD>
-guideVersion: "{{GUIDE_VERSION}}"
+guideVersion: "<the version in content/guide.md's frontmatter>"
 model: "<the exact model ID writing this, e.g. claude-opus-5>"
 effort: "<the reasoning effort you ran at, e.g. high — only if you know it>"
 read:                     # everything you opened, one line each — see below
@@ -117,7 +110,7 @@ guideNotes:               # optional, see below
 ```
 
 Omit any field you do not have rather than guessing. Never invent a DOI, a journal, or an
-author list. Outside Claude Code, leave out `design` and `topics`; the editor adds them.
+author list.
 
 `verdict` appears on the index page under the title, so it must stand alone. "No control group,
 no blinding and only subjective outcomes, so the reported improvement cannot be separated from
@@ -131,8 +124,10 @@ be written by more than one model, and two reviews disagreeing is only interpret
 reader can see what wrote each one. If you cannot tell which model you are, leave it out.
 
 `effort` records the reasoning effort you ran at — `low`, `medium`, `high`, `xhigh` or `max` —
-because the same model reviews differently at different efforts. Only add it if you actually
-know it; if you cannot tell, leave it out and the editor can add it.
+because the same model reviews differently at different efforts. In a cloud session, call the
+`get_session` tool (claude-code-remote) with no session ID and read `session_context.model` and
+`external_metadata.effort_level`; the effort can change during a session, so read it when you
+write the frontmatter. If you cannot find it, leave it out and the editor can add it.
 
 Never add `humanInput` unless the editor tells you the level. It records how much the editor
 changed your text, which only the editor knows, and it is set when the review is published.
@@ -207,7 +202,7 @@ These get published as statements of fact about named people and organisations, 
 
 ### guideNotes
 
-If reviewing this paper surfaced a methodological point the guide does not cover, or gets wrong,
+If reviewing this paper surfaced a general-enough methodological point the guide does not cover, or gets wrong,
 put it in `guideNotes` as one short clause each. Do not apply it to the review as if it were
 already in the guide, and do not write it into the guide yourself. The editor collects these and
 decides what goes into the next version.
@@ -256,5 +251,4 @@ first on the page, so write terms out there again.
 The executive summary is, with the frontmatter, what most readers will read. Be careful with
 introducing technical language there: if a term is needed, explain it in plain words.
 
-Write in plain English and short sentences. Say what is wrong without sneering. These reviews
-name real researchers: criticise the evidence and the framing, never the people.
+Write in plain English and short sentences.

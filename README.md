@@ -32,11 +32,8 @@ invents a grade, never softens a judgement, and never appends a section summaris
 changed. If the source states no overall grade, it leaves the score unset for you to fill in
 rather than guessing one. Needs `ANTHROPIC_API_KEY`; see the deployment table below.
 
-For reviews written in a claude.ai project, point that project at
-`https://pais-review.vercel.app/instructions.md` — see "One source of truth" below.
-
-The "Edit a page" tab does the same for the About and Methods pages, the guide, the
-instructions and the prompt: it loads the current markdown, you edit it, publishing commits it.
+The "Edit a page" tab does the same for the About and Methods pages, the guide and the
+instructions: it loads the current markdown, you edit it, publishing commits it.
 
 It also has **Site text**: one labelled box for each piece of public text that is not a page —
 the pilot banner, the footer, the home page heading and intro, section headings and labels on
@@ -141,27 +138,23 @@ than as part of the methodological assessment.
 
 ## The method, and its one version number
 
-Three documents are "the method": the guide (`content/guide.md`), the reviewing instructions
-(`content/instructions.md`) and the project prompt (`content/prompt.md`). They share one
-version number, kept in the guide's frontmatter, and every review records which version it was
-written under. Saving any of the three from `/admin` requires a new version; for the
-instructions and the prompt the editor writes it into the guide for you. Log what changed in
-the guide's changelog.
+Reviews are written in Claude Code with the review skill (`.claude/skills/review/SKILL.md`),
+which follows the reviewing instructions (`content/instructions.md`) and the guide
+(`content/guide.md`). The guide and the instructions share one version number, kept in the
+guide's frontmatter, and every review records which version it was written under. Saving either
+from `/admin` requires a new version, which the editor writes into the guide's changelog for you.
 
-`/methods` explains the whole thing publicly, shows the prompt verbatim, and links the raw
-files. Raw markdown URLs, for pointing a model at:
+`/methods` explains the whole thing publicly and shows the instructions and the skill in full.
+Raw markdown URLs, for pointing a model at:
 
 | URL | What it is |
 |---|---|
 | `/guide.md` | The guide. |
 | `/instructions.md` | The reviewing instructions, version and site URL filled in. |
-| `/prompt.md` | The project prompt, verbatim. |
+| `/review-skill.md` | The review skill, as the repository has it. |
 | `/reviews/<slug>.md` | Any published review, frontmatter and all. |
 
-So a claude.ai project needs only the prompt, which tells it to fetch `/instructions.md`.
-Update the guide here and the project follows, with nothing to re-upload anywhere.
-
-Never hard-code a version number in the instructions, prompt or methods pages. Write
+Never hard-code a version number in the methods page. Write
 `{{GUIDE_VERSION}}` and `{{SITE_URL}}`; both are filled in when served.
 
 ## Updating the guide
