@@ -20,9 +20,37 @@ executive summary, then the frontmatter.
 
 1. Read `content/instructions.md` and `content/guide.md`.
 2. Check whether a review of this paper already exists in `content/reviews/`.
-3. Save the text of every source you rely on — the paper, the supplement, the protocol, cited
-   papers — as plain-text files in your scratchpad, one per source. The fact check after
-   writing reads these, not your memory of them.
+3. Fetch the sources in one step:
+   `npm run -s fetch-sources -- <doi, PMID or PMCID> <folder in your scratchpad>`. It saves the
+   full text (`paper.txt`), the PDF, every figure as an image (`figures/`), the supplementary
+   files (`supplement/`), each trial registration the paper names (`registrations/`, with
+   the outcomes as registered), and retraction and correction notices, and writes
+   `SOURCES.md`, saying what it found and what is missing. Read `SOURCES.md` first.
+4. Fill the gaps it lists yourself: the protocol, the statistical analysis plan, a cited
+   paper a claim leans on, a figure it could not get. Save each extra source as a file in the
+   same folder. The fact check after writing reads that folder, not your memory of it. If the
+   full text or the figures cannot be had, ask the user for them now, before writing.
+
+## Do the whole review in one pass
+
+Every extra round costs about as much again as the first, because the whole session is read
+again on each step, and a session left waiting is stored again when it resumes. So:
+
+- Gather everything before writing: the full text, every figure looked at as an image, the
+  supplement where the methods or results lean on it, the registration. Do not come back to
+  the figures later.
+- Then write, fact check, build and record without stopping. Stop to ask only when you are
+  blocked, and then ask everything you need in one message.
+
+## Keep large text out of the conversation
+
+Everything printed in a session stays in it and is read again on every later step. So:
+
+- Do not print a whole paper, supplement, web page or PDF. Search the saved files with Grep,
+  and read the sections you need with Read and a line range. Look at figures one at a time.
+- Save a web page to a file and search it, rather than reading it in full, unless it is short.
+- Keep command output short: `npm run build 2>&1 | tail -15`, and the same for tests and
+  checks. Read the full output only when something fails.
 
 ## Writing
 
@@ -35,7 +63,7 @@ executive summary, then the frontmatter.
 ## After writing
 
 1. **Blind fact check.** Spawn one fresh agent with the Agent tool. Give it only the path to
-   the review file and the paths to the source files you saved, and tell it: check every
+   the review file and the path to the sources folder, and tell it: check every
    factual claim in the review — numbers, quotes, who said or did what, what a source does or
    does not report — against those files; do not judge the grade, the framing or the
    argument; do not use the web or its own memory of the paper; report each claim that is
@@ -77,8 +105,8 @@ executive summary, then the frontmatter.
    was wrong). `response` is required for `partly` and `disputed`: say what in the source
    shows it, plainly, without arguing. If the fact check found nothing, write
    `"findings": []`.
-2. Run `npm run build` to confirm the frontmatter parses, the grade line matches the score,
-   and the site still builds.
+2. Run `npm run build 2>&1 | tail -15` to confirm the frontmatter parses, the grade line
+   matches the score, and the site still builds.
 3. Show the user the verdict, score, strengths and weaknesses before committing.
 4. Fill in `read` from what you actually opened in this session, one line per thing, saying
    what it was and how you read it: the full text and where it came from, which figures you

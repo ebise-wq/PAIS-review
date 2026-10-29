@@ -1,6 +1,6 @@
 ---
 title: Guide to peer review in post-acute infection syndromes
-version: "0.10.1"
+version: "0.10.2"
 updated: 2026-10-29
 authors: The editor (main), Claude
 
@@ -229,6 +229,9 @@ Could hypovolemia affect the comparability of blood levels?
 
 ## Changelog
 
+- **0.10.2** (2026-10-29) — Review skill: one command fetches the paper, figures,
+  supplement and trial registration; the review is done in one pass, figures included; long
+  text is kept out of the session. To make reviews cheaper. No criteria changed.
 - **0.10.1** (2026-10-29) — Instructions: reviews are now written only in Claude Code, so
   the claude.ai prompt and the section on reviewing in a chat are gone; the rules for
   discussing a draft stay. Guide notes are for general-enough points. Removed the closing

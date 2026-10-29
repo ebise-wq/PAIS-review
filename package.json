@@ -11,7 +11,8 @@
     "check:abbreviations": "node scripts/check-abbreviations.mjs",
     "session-stats": "node --import tsx scripts/session-stats.mjs",
     "restore-backup": "node --import tsx scripts/restore-backup.mjs",
-    "test": "node --import tsx --test tests/*.test.mjs"
+    "test": "node --import tsx --test tests/*.test.mjs",
+    "fetch-sources": "NODE_USE_ENV_PROXY=1 node --disable-warning=UNDICI-EHPA --import tsx scripts/fetch-sources.mjs"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.126.0",
