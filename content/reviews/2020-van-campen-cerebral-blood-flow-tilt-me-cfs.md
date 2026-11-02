@@ -37,6 +37,7 @@ guideNotes:
   - "Ultrasound blood flow: was image acquisition blinded, not only the offline analysis?"
   - "Cerebral blood flow on tilt: was the comparison adjusted for end-tidal carbon dioxide?"
   - "Lower limits of normal set from a small control group: ask for validation in an independent and a disease control sample"
+humanInput: none
 ---
 
 ## Study design
