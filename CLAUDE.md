@@ -3,7 +3,7 @@
 - Do not write public text other than the reviews themselves: no About page prose, citations,
   methods wording or site copy unless the editor asks for that exact change. When the editor
   supplies wording, use it verbatim.
-- `main` is the live site. Work on a branch; nothing reaches `main` until the editor says to merge.
+- `main` is the live site. Only review drafts go directly to main. For any other changes, work on a branch; no changes reach `main` until the editor says to merge.
 - Never put the editor's name in files, commits or pull requests.
 - When you change a review after its session handed it over (a correction, a re-grade), add
   `{"date": "YYYY-MM-DD", "summary": "..."}` to `changes` in its `.process.json`, saying what
