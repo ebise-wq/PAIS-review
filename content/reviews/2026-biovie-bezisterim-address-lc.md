@@ -7,7 +7,6 @@ url: "https://investors.bioviepharma.com/news/news-details/2026/BioVie-Announces
 conditions: ["Long Covid"]
 studyType: "Randomised placebo-controlled trial, n=203, 12 weeks"
 kind: preliminary
-draft: true
 humanInput: none
 reviewedOn: 2026-10-19
 guideVersion: "0.8.1"
