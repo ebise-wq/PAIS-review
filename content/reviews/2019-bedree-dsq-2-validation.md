@@ -13,7 +13,7 @@ reviewedOn: 2026-10-29
 guideVersion: "0.10.1"
 model: "claude-opus-5-5"
 effort: "medium"
-humanInput: none
+humanInput: moderate
 draft: true
 read:
   - "Full text, author manuscript from PubMed Central (PMC7367506), fetched as XML through the PubMed Central OAI service and converted to plain text"
@@ -21,6 +21,8 @@ read:
   - "No supplementary files: none are listed in the manuscript"
   - "The DSQ-2 questionnaire itself (linked in the paper) was not opened"
   - "Cited papers were not opened; claims about them rest on the paper's own descriptions and reference titles"
+  - "Added after the first draft, to check the existing post-exertional malaise items: Jason and Sunnquist 2018, The development of the DePaul Symptom Questionnaire, Frontiers in Pediatrics (PMC6232226), main text from PubMed Central XML; its questionnaire data sheets were not opened"
+  - "Added after the first draft: Cotler et al. 2018, A brief questionnaire to assess post-exertional malaise, Diagnostics (PMC6165517), full text including Appendix A (the item list) and Tables 1 to 3, from PubMed Central XML; Figure 1 not viewed"
 score: 4.5
 verdict: "A sensible revision of a patient questionnaire, honestly described, but with no comparison group, no reference diagnosis and no repeat testing it cannot show the validity and reliability its title and conclusion claim."
 confidence: "high"
@@ -33,11 +35,11 @@ weaknesses:
   - "No comparison group or reference diagnosis"
   - "More people meeting criteria is built into the design"
   - "Symptom grouping chosen by judgement, not checked"
-  - "Post-exertional malaise items not tested against others"
+  - "New post-exertional malaise items not tested against others"
 guideNotes:
   - "Questionnaire validation: check for controls, a reference standard and repeat testing; endorsement rates in patients alone say nothing about accuracy"
   - "A revised scoring rule that only adds ways to qualify will raise case rates by construction; that is not evidence of validity"
-  - "The guide names the DSQ-2 as best for post-exertional malaise; the source of that recommendation should be cited, since the DSQ-2's own validation paper does not test it"
+  - "The guide names the DSQ-2 as best for post-exertional malaise; cite the source, likely Cotler et al. 2018 (the DSQ-PEM subscale, duration item tested against multiple sclerosis and post-polio syndrome), since the DSQ-2's own validation paper does not test it"
 ---
 
 ## Study design
@@ -84,7 +86,13 @@ The three new Ramsay items on post-exertional malaise (PEM) were the most endors
 
 High endorsement in a patient-only sample does not show that. An item that 90% of patients endorse tells you nothing about how well it separates patients from other people, unless you know how often other people endorse it. People with depression, deconditioning or other fatiguing illnesses may also report feeling worse after activity. The paper has no data on that. Very high endorsement also means the item cannot tell much apart within this sample.
 
-The items also do not capture what the guide treats as defining PEM: a delay in onset and a prolonged recovery. They ask how often and how badly symptoms worsen after mild activity. That is part of PEM, but not the part that best separates it from ordinary post-exercise fatigue. The DSQ-2 also contains other PEM-related items, but this paper does not test any of them for PEM ascertainment. The guide names the DSQ-2 as the current best questionnaire for PEM. Whatever that rests on, it is not this paper.
+The three new items also do not capture what the guide treats as defining PEM: a delay in onset and a prolonged recovery. They ask how often and how badly symptoms worsen after mild activity. That is part of PEM, but not the part that best separates it from ordinary post-exercise fatigue.
+
+The questionnaire as a whole does ask about these things, through items it already had. The DSQ-2 keeps every DSQ-1 item, and the DSQ-1 includes "Next day soreness or fatigue after non-strenuous, everyday activities", which touches on delay; "If you were to become exhausted after ... outings with friends, would you recover within an hour or two after the activity ended?"; and "If you feel worse after activities, how long does this last?", with answers from under an hour to 24 hours or more. No item asks how soon after exertion symptoms begin. These item wordings come from a separate 2018 paper by the same group (Cotler et al., in Diagnostics), not from this one.
+
+That 2018 paper tested the duration item against other illnesses. Among people reporting ME or CFS, 73.4% said worsening lasted 24 hours or more, against 8.9% of people reporting multiple sclerosis and 13.8% reporting post-polio syndrome. The item's area under the curve (a measure of how well it separates the groups, where 1 is perfect and 0.5 is chance) was 0.88. That study has its own limits: diagnoses were self-reported, recruitment was online, the comparison groups were other illnesses rather than healthy people or people with depression, and the authors were testing their own instrument. But it is evidence that the questionnaire can capture prolonged PEM, and it is the likeliest basis for the guide naming the DSQ-2 as the current best questionnaire for PEM.
+
+The present paper does not report the duration item at all. Its "Next day soreness" item appears only as a factor loading (.78). So the questionnaire's most discriminating PEM question goes unmentioned, while three new and much less specific items are presented as the main PEM finding.
 
 ### Missing items from the tables
 
@@ -172,11 +180,12 @@ It does not show:
 - Response and completion rates, and missing data per item.
 - The scoring rules themselves, or a reference to where they are published, for both versions.
 - A full list of the 36 new items and results for all of them.
+- Results for the existing PEM duration and recovery items, which the paper had but does not report.
 - An objective rule for the number of factors, and a confirmatory check in a separate sample.
 
 ## Recommendations
 
-For researchers using the DSQ-2: this paper supports using the split attention, vision and weight items and the revised alcohol items, since these are clear improvements in wording. It does not support citing the DSQ-2 as "validated" for case definition fulfillment or for PEM ascertainment. If those claims are needed, look for studies that test the DSQ-2 against controls, a clinical reference or repeat measurement.
+For researchers using the DSQ-2: this paper supports using the split attention, vision and weight items and the revised alcohol items, since these are clear improvements in wording. It does not support citing the DSQ-2 as "validated" for case definition fulfillment or for PEM ascertainment. If those claims are needed, look for studies that test the DSQ-2 against controls, a clinical reference or repeat measurement. For PEM, the item on how long worsening lasts has been tested against people with multiple sclerosis and post-polio syndrome in a separate study (Cotler et al., 2018); use it, not the three new items, when PEM needs to be told apart from other illnesses.
 
 For researchers reading papers that use the DSQ-2 to classify people as meeting the ME-ICC: the DSQ-2 rules classify almost a quarter more people as meeting it than the DSQ-1 rules (66.3% against 53.9% here). Rates from the two versions are not directly comparable.
 
@@ -204,7 +213,7 @@ But the paper calls itself a validation study, and it does not test validity. Th
 
 Two headline results are built into the design. More people met the strict international consensus criteria for ME with the new version (66.3% against 53.9%), but the new version simply gives more ways to meet them. The paper also says the old and new scoring agree, so both are reliable. But they were applied to the same answers and share most questions, so they had to agree. The statistical grouping of symptoms was chosen by judgement, dropped 33 of 72 symptoms, and was not checked in a second sample.
 
-The new questions on feeling worse after mild activity were endorsed by up to 90% of patients. Without controls, that says nothing about whether they pick out post-exertional malaise. They also do not ask about the delay and slow recovery that define it.
+The new questions on feeling worse after mild activity were endorsed by up to 90% of patients. Without controls, that says nothing about whether they pick out post-exertional malaise. They also do not ask about the delay and slow recovery that define it. The questionnaire already had a question on how long the worsening lasts. A separate study by the same group found it separates ME/CFS from multiple sclerosis and post-polio syndrome fairly well. This paper does not report it.
 
 The revisions are sensible and the numbers are honestly reported. The claims of validity and reliability go well beyond what the study can show.
 
