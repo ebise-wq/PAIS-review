@@ -14,7 +14,6 @@ guideVersion: "0.10.1"
 model: "claude-opus-5-5"
 effort: "medium"
 humanInput: moderate
-draft: true
 read:
   - "Full text, author manuscript from PubMed Central (PMC7367506), fetched as XML through the PubMed Central OAI service and converted to plain text"
   - "Tables 1 to 5, read from the same XML; the paper has no figures"
