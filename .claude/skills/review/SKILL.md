@@ -119,9 +119,10 @@ Everything printed in a session stays in it and is read again on every later ste
    reports. The totals cover the whole session, so
    write one review per session. Commit the `.process.json` file with the review.
 6. Save it as a draft: add `draft: true` to the frontmatter. Commit and push only when the
-   user says so. A draft is not on the site; the user reads it in the site design at
-   `/admin/preview/<filename without .md>` and publishes it from the top of that page, which
-   is also where they set the human-input level. Give them that link after pushing.
+   user says so, and push it to `main`, not to the session's branch (see `CLAUDE.md` for the
+   steps): the preview page reads `main`. A draft is not on the site; the user reads it in the
+   site design at `/admin/preview/<filename without .md>` and publishes it from the top of
+   that page, which is also where they set the human-input level. Give them that link after pushing.
 7. Do not set `humanInput` yourself: only the user knows how much they changed. If they tell
    you the level and ask you to publish directly, set `humanInput` to their answer and leave
    out `draft`.
