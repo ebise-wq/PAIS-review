@@ -12,6 +12,8 @@ kind: paper
 reviewedOn: 2026-10-29
 guideVersion: "0.10.1"
 model: "claude-opus-5-5"
+effort: "medium"
+humanInput: none
 draft: true
 read:
   - "Full text, author manuscript from PubMed Central (PMC7367506), fetched as XML through the PubMed Central OAI service and converted to plain text"
