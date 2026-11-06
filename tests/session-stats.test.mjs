@@ -2,6 +2,7 @@ import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { sessionUrl, sumUsage } from '../src/lib/session-stats.ts';
 import { factCheckSummary, parseProcess, readableCount } from '../src/lib/process.ts';
+import { costOf, formatDollars, priceKey, sessionCost } from '../src/lib/pricing.ts';
 
 const line = (id, usage, timestamp) => JSON.stringify({ type: 'assistant', timestamp, message: { id, usage } });
 
@@ -14,7 +15,46 @@ test('a model call is counted once, however many lines repeat it; long pauses ar
     '{"type":"user","timestamp":"2026-10-28T09:00:00Z"}',
     'not json',
   ]);
-  assert.deepEqual(totals, { tokens: { input: 20, output: 10, cacheRead: 200, cacheWrite: 40 }, calls: 2, minutes: 15 });
+  const tokens = { input: 20, output: 10, cacheRead: 200, cacheWrite: 40, cacheWrite1h: 0 };
+  assert.deepEqual(totals, { tokens, byModel: { unknown: tokens }, calls: 2, minutes: 15 });
+});
+
+test('tokens are also totalled per model, with one-hour cache writes counted apart', () => {
+  const call = (id, model, usage) => JSON.stringify({ type: 'assistant', message: { id, model, usage } });
+  const usage = { input_tokens: 1, output_tokens: 2, cache_read_input_tokens: 3, cache_creation_input_tokens: 10, cache_creation: { ephemeral_1h_input_tokens: 6 } };
+  const totals = sumUsage([
+    call('a', 'claude-opus-5-5', usage),
+    call('b', 'claude-opus-5-5', usage),
+    call('c', 'claude-haiku-5-5', usage),
+    call('d', '<synthetic>', { input_tokens: 0, output_tokens: 0 }),
+  ]);
+  assert.deepEqual(Object.keys(totals.byModel).sort(), ['claude-haiku-5-5', 'claude-opus-5-5']);
+  assert.deepEqual(totals.byModel['claude-opus-5-5'], { input: 2, output: 4, cacheRead: 6, cacheWrite: 20, cacheWrite1h: 12 });
+  assert.equal(totals.tokens.cacheWrite1h, 18);
+});
+
+test('cost at API prices: each model at its own rate, cache writes by duration', () => {
+  const million = { input: 1e6, output: 1e6, cacheRead: 1e6, cacheWrite: 1e6, cacheWrite1h: 0 };
+  // Opus 5.5: $4 in, $20 out, $0.20 cache read, five-minute write at 1.25 × $4.
+  assert.equal(costOf(million, 'claude-opus-5-5'), 4 + 20 + 0.2 + 5);
+  // Older records do not split writes: they are priced as one-hour writes (2 × input).
+  const { cacheWrite1h, ...unsplit } = million;
+  assert.equal(costOf(unsplit, 'claude-opus-5-5[1m]'), 4 + 20 + 0.2 + 8);
+  assert.equal(costOf(million, 'some-other-model'), undefined);
+  assert.equal(priceKey('anthropic.claude-sonnet-5-5'), 'claude-sonnet-5-5');
+  // With a per-model breakdown, the review's own model is not used.
+  assert.equal(sessionCost(million, { 'claude-sonnet-5-5': million }, 'claude-opus-5-5'), 2 + 10 + 0.2 + 2.5);
+  assert.equal(sessionCost(million, undefined, 'claude-opus-5-5'), 4 + 20 + 0.2 + 5);
+  assert.equal(sessionCost(million, { 'claude-opus-5-5': million, mystery: million }, undefined), undefined);
+  assert.equal(formatDollars(1234.567), '$1,234.57');
+  assert.equal(formatDollars(0.001), 'under $0.01');
+});
+
+test('the per-model totals are read back from the record', () => {
+  const t = { input: 1, output: 2, cacheRead: 3, cacheWrite: 4, cacheWrite1h: 4 };
+  const { process, problems } = parseProcess({ tokens: t, tokensByModel: { 'claude-opus-5-5': t, bad: { input: 'x' } } });
+  assert.deepEqual(process.tokensByModel, { 'claude-opus-5-5': t });
+  assert.equal(problems.length, 1);
 });
 
 test('a cloud session id becomes its claude.ai address', () => {

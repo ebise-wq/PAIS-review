@@ -2,7 +2,7 @@ import Anthropic from '@anthropic-ai/sdk';
 import { zodOutputFormat } from '@anthropic-ai/sdk/helpers/zod';
 import matter from 'gray-matter';
 import { z } from 'zod';
-import { REVIEW_KINDS, SIGNALS, accessOf } from './types';
+import { REVIEW_KINDS, SIGNALS, accessOf, guideConflictsOf } from './types';
 
 /**
  * The model doing the conversion, overridable with NORMALISER_MODEL.
@@ -167,6 +167,7 @@ export async function normaliseReview(raw: string): Promise<NormaliseResult> {
     guideNotes: Array.isArray(original.guideNotes)
       ? original.guideNotes.map((note) => String(note).trim()).filter(Boolean)
       : undefined,
+    guideConflicts: guideConflictsOf(original.guideConflicts),
     model: carriedOver('model'),
     effort: carriedOver('effort'),
     // Tags come from the controlled list; the tidier never invents them.

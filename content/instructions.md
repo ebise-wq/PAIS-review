@@ -33,6 +33,13 @@ conditions in ways generic appraisal checklists are not — PEM ascertainment, c
 which outcome measures are actually effort-independent. Always read it rather than working
 from memory: it changes, and every review records which version it was written under.
 
+**When your judgement and the guide disagree.** The guide is incomplete and can be wrong. If
+your own judgement about this paper pulls a different way from the guide, apply whichever is
+more rigorous: the one that asks more of the evidence before accepting a claim. Never settle
+the conflict silently, in either direction, and do not set a rule of the guide aside because
+it seems too strict for this paper. Record every conflict in `guideConflicts` (see below), so
+the editor can decide whether the guide should change.
+
 Where it matters, check claims against primary sources: the trial registration for
 pre-registration and outcome switching, the supplement for methods the main text skips, cited
 papers where a claim leans on them. Say what you could not check.
@@ -104,8 +111,12 @@ weaknesses:
 context:                  # optional, see below
   - note: "<a fact outside the paper that bears on reading it>"
     source: "<url>"
-guideNotes:               # optional, see below
-  - "<something this paper surfaced that the guide does not cover>"
+guideNotes:               # optional, see below; usually empty
+  - "<a major methodological point the guide does not cover or gets wrong>"
+guideConflicts:           # optional, see below
+  - guide: "<what the guide says>"
+    judgement: "<what you judged instead, and why>"
+    applied: "judgement"  # guide | judgement: whichever was more rigorous
 ---
 ```
 
@@ -202,10 +213,30 @@ These get published as statements of fact about named people and organisations, 
 
 ### guideNotes
 
-If reviewing this paper surfaced a general-enough methodological point the guide does not cover, or gets wrong,
-put it in `guideNotes` as one short clause each. Do not apply it to the review as if it were
-already in the guide, and do not write it into the guide yourself. The editor collects these and
-decides what goes into the next version.
+`guideNotes` are for points that would improve the guide for every later review, not notes on
+this paper. Before adding one, grade it:
+
+- **major** — a general methodological point the guide does not cover or gets wrong, that
+  applies to many papers in this field and would change how they are reviewed;
+- **moderate** — true, but narrow: it applies to a few papers, or one kind of design;
+- **minor** — specific to this study, or already covered by the guide or by ordinary
+  appraisal practice.
+
+Put only major points in `guideNotes`, as one short clause each. Leave out moderate and minor
+ones; where they matter for this paper, they belong in the body. Most reviews will have no
+guide notes, and that is the expected outcome, not a gap to fill.
+
+Do not apply a note to the review as if it were already in the guide, and do not write it into
+the guide yourself. The editor collects these and decides what goes into the next version.
+
+### guideConflicts
+
+Each place where your judgement and the guide pulled different ways (see **When your judgement
+and the guide disagree**), as three fields: `guide`, what the guide says, briefly; `judgement`,
+what you judged instead and why, in a sentence or two; `applied`, `guide` or `judgement`,
+whichever you applied, which is always the more rigorous one. Record a conflict even when the
+guide was the more rigorous and you applied it. A conflict goes here, not in `guideNotes`, and
+is not graded: the editor sees every one. Readers do not see this field.
 
 ### The body
 

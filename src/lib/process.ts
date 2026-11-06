@@ -32,6 +32,8 @@ export interface Finding {
 
 export interface ReviewProcess {
   tokens?: TokenTotals;
+  /** The same totals for each model that ran, so each is priced at its own rate. */
+  tokensByModel?: Record<string, TokenTotals>;
   /** Active minutes, and the claude.ai link for a cloud session. */
   session?: { minutes?: number; url?: string };
   /** Present once a fact check has run, even if it found nothing. */
@@ -57,11 +59,29 @@ export function parseProcess(raw: unknown): { process: ReviewProcess; problems: 
   const process: ReviewProcess = {};
   const record = raw && typeof raw === 'object' ? (raw as Record<string, unknown>) : {};
 
-  const tokens = record.tokens as Record<string, unknown> | undefined;
-  if (tokens) {
-    const parts = { input: count(tokens.input), output: count(tokens.output), cacheRead: count(tokens.cacheRead), cacheWrite: count(tokens.cacheWrite) };
-    if (Object.values(parts).every((n) => n !== undefined)) process.tokens = parts as TokenTotals;
+  const tokensOf = (raw: unknown): TokenTotals | undefined => {
+    const t = raw && typeof raw === 'object' ? (raw as Record<string, unknown>) : {};
+    const parts = { input: count(t.input), output: count(t.output), cacheRead: count(t.cacheRead), cacheWrite: count(t.cacheWrite) };
+    if (!Object.values(parts).every((n) => n !== undefined)) return undefined;
+    const oneHour = count(t.cacheWrite1h);
+    return { ...(parts as TokenTotals), ...(oneHour !== undefined ? { cacheWrite1h: oneHour } : {}) };
+  };
+
+  if (record.tokens !== undefined) {
+    const tokens = tokensOf(record.tokens);
+    if (tokens) process.tokens = tokens;
     else problems.push('"tokens" needs input, output, cacheRead and cacheWrite as whole numbers.');
+  }
+
+  if (record.tokensByModel !== undefined) {
+    const raw = record.tokensByModel && typeof record.tokensByModel === 'object' ? (record.tokensByModel as Record<string, unknown>) : {};
+    const byModel: Record<string, TokenTotals> = {};
+    for (const [model, value] of Object.entries(raw)) {
+      const tokens = tokensOf(value);
+      if (tokens) byModel[model] = tokens;
+      else problems.push(`"tokensByModel" for ${model} needs input, output, cacheRead and cacheWrite as whole numbers.`);
+    }
+    if (Object.keys(byModel).length) process.tokensByModel = byModel;
   }
 
   const session = record.session as Record<string, unknown> | undefined;

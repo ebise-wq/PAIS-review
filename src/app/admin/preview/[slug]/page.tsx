@@ -9,6 +9,7 @@ import { parseProcess } from '@/lib/process';
 import type { Review } from '@/lib/types';
 import { ReviewView } from '@/components/ReviewView';
 import { DraftBanner } from '@/components/DraftBanner';
+import { GuideConflicts } from '@/components/GuideConflicts';
 
 export const dynamic = 'force-dynamic';
 
@@ -85,7 +86,12 @@ export default async function PreviewPage({ params }: Params) {
   return (
     <ReviewView
       review={review}
-      banner={<DraftBanner slug={slug} draft={Boolean(review.draft)} humanInput={review.humanInput ?? null} />}
+      banner={
+        <>
+          <DraftBanner slug={slug} draft={Boolean(review.draft)} humanInput={review.humanInput ?? null} />
+          <GuideConflicts conflicts={review.guideConflicts ?? []} />
+        </>
+      }
     />
   );
 }

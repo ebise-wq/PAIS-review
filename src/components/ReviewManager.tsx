@@ -1,7 +1,9 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { HUMAN_INPUT_LABELS, HUMAN_INPUT_LEVELS, type HumanInput, type ReviewKind, type Signal } from '@/lib/types';
+import { HUMAN_INPUT_LABELS, HUMAN_INPUT_LEVELS, type GuideConflict, type HumanInput, type ReviewKind, type Signal } from '@/lib/types';
+import { formatDollars } from '@/lib/pricing';
+import { ConflictText } from './GuideConflicts';
 import { EMPTY_TAGS, type TagList } from '@/lib/tags';
 import { ScoreBadge } from './ScoreBadge';
 
@@ -13,6 +15,7 @@ interface Row {
   reviewedOn: string;
   guideVersion: string | null;
   guideNotes: string[];
+  guideConflicts: GuideConflict[];
   humanInput: HumanInput | null;
   preprint: boolean;
   conditions: string[];
@@ -22,6 +25,8 @@ interface Row {
   signal: Signal | null;
   verdict: string;
   tokens: { total: number; cached: number } | null;
+  /** US dollars at current API prices; null if unknown. */
+  cost: number | null;
   minutes: number | null;
   /** One line, e.g. "1 major (fixed); 2 moderate (1 fixed, 1 disputed)". */
   factCheck: string | null;
@@ -29,11 +34,13 @@ interface Row {
 
 const compact = (n: number) => (n >= 1e6 ? `${(n / 1e6).toFixed(1)}M` : `${Math.round(n / 1e3)}k`);
 
-/** "1.2M tokens (1.0M cached) · 48 min · fact check: 2 moderate (1 fixed, 1 disputed)" */
+/** "1.2M tokens (1.0M cached) · ~$3.10 · 48 min · fact check: 2 moderate (1 fixed, 1 disputed)" */
 function processLine(row: Row): string | null {
   const parts = [
     row.tokens !== null && `${compact(row.tokens.total)} tokens (${compact(row.tokens.cached)} cached)`,
+    row.cost !== null && `~${formatDollars(row.cost)}`,
     row.minutes !== null && `${row.minutes} min`,
+    row.guideConflicts.length > 0 && `${row.guideConflicts.length} conflict${row.guideConflicts.length === 1 ? '' : 's'} with the guide`,
     row.factCheck && `fact check: ${row.factCheck}`,
   ].filter(Boolean);
   return parts.length ? parts.join(' · ') : null;
@@ -127,6 +134,12 @@ export function ReviewManager({ onExpired }: { onExpired: () => void }) {
   const drafts = rows.filter((row) => row.draft);
   const published = rows.filter((row) => !row.draft);
   const notes = rows.flatMap((row) => row.guideNotes.map((note) => ({ note, slug: row.slug, title: row.title })));
+  const conflicts = rows.flatMap((row) => row.guideConflicts.map((conflict) => ({ conflict, row })));
+  const link = (row: Row) => (
+    <a href={row.draft ? `/admin/preview/${row.slug}` : `/reviews/${row.slug}`} className="manage-meta">
+      — {row.title.length > 60 ? `${row.title.slice(0, 60)}…` : row.title}
+    </a>
+  );
 
   const item = (row: Row) => (
     <li key={row.slug} className={row.draft ? 'is-draft' : ''}>
@@ -206,17 +219,27 @@ export function ReviewManager({ onExpired }: { onExpired: () => void }) {
       <h2 className="manage-heading">Published ({published.length})</h2>
       <ul className="manage-list">{published.map(item)}</ul>
 
+      <h2 className="manage-heading">Conflicts with the guide</h2>
+      {conflicts.length === 0 ? (
+        <p className="hint">No review has flagged a conflict with the guide.</p>
+      ) : (
+        <ul className="notes-list">
+          {conflicts.map(({ conflict, row }, index) => (
+            <li key={`${row.slug}-c${index}`}>
+              <ConflictText conflict={conflict} /> {link(row)}
+            </li>
+          ))}
+        </ul>
+      )}
+
       <h2 className="manage-heading">Notes for the guide</h2>
       {notes.length === 0 ? (
         <p className="hint">No review has flagged anything for the guide yet.</p>
       ) : (
         <ul className="notes-list">
-          {notes.map((note, index) => (
-            <li key={`${note.slug}-${index}`}>
-              {note.note}{' '}
-              <a href={`/reviews/${note.slug}`} className="manage-meta">
-                — {note.title.length > 60 ? `${note.title.slice(0, 60)}…` : note.title}
-              </a>
+          {notes.map(({ note, slug }, index) => (
+            <li key={`${slug}-${index}`}>
+              {note} {link(rows.find((row) => row.slug === slug)!)}
             </li>
           ))}
         </ul>

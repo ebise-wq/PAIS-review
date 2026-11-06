@@ -70,3 +70,19 @@ test('what the model read is kept, and odd values are dropped', () => {
   assert.match(built.markdown, /access:\n {2}fullText: true\n {2}figures: false/);
   assert.equal(buildReviewFile(file('kind: paper\nscore: 7')).review.access, undefined);
 });
+
+test('conflicts with the guide are kept; an entry missing a side is dropped', () => {
+  const yaml = [
+    'kind: paper',
+    'score: 6',
+    'guideConflicts:',
+    '  - guide: "Self-report Fukuda gives f = 0.3 or less"',
+    '    judgement: "This cohort was clinically assessed, so f is higher"',
+    '    applied: guide',
+    '  - guide: "No side given"',
+    '  - guide: "Applied missing"',
+    '    judgement: "Defaults to the judgement"',
+  ].join('\n');
+  const conflicts = buildReviewFile(file(yaml)).review.guideConflicts;
+  assert.deepEqual(conflicts.map((c) => c.applied), ['guide', 'judgement']);
+});

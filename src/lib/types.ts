@@ -61,6 +61,34 @@ export function accessOf(value: unknown): Access | undefined {
   return Object.keys(out).length ? out : undefined;
 }
 
+/** One disagreement between the reviewer's judgement and the guide. */
+export interface GuideConflict {
+  /** What the guide says, briefly. */
+  guide: string;
+  /** What the reviewer judged instead, and why. */
+  judgement: string;
+  /** Which of the two the review applied: always the more rigorous one. */
+  applied: 'guide' | 'judgement';
+}
+
+/**
+ * Reads `guideConflicts` from frontmatter. An entry missing what the guide says or what
+ * the reviewer judged is dropped; one without a valid `applied` keeps the entry and says
+ * the judgement was applied, since that is the usual reason to flag a conflict.
+ */
+export function guideConflictsOf(value: unknown): GuideConflict[] {
+  if (!Array.isArray(value)) return [];
+  return value.flatMap((entry) => {
+    if (!entry || typeof entry !== 'object') return [];
+    const item = entry as Record<string, unknown>;
+    const guide = typeof item.guide === 'string' ? item.guide.trim() : '';
+    const judgement = typeof item.judgement === 'string' ? item.judgement.trim() : '';
+    if (!guide || !judgement) return [];
+    const applied = String(item.applied ?? '').trim().toLowerCase() === 'guide' ? 'guide' : 'judgement';
+    return [{ guide, judgement, applied }];
+  });
+}
+
 /** "Full text and figures; not the supplement", for the review page. */
 export function accessSummary(access: Access): string {
   const names: Record<(typeof ACCESS_PARTS)[number], string> = { fullText: 'full text', figures: 'figures', supplement: 'supplement' };
@@ -137,6 +165,12 @@ export interface ReviewFrontmatter {
    * automatically.
    */
   guideNotes?: string[];
+  /**
+   * Places where the reviewer's own judgement and the guide pulled different ways. The
+   * reviewer applies whichever is more rigorous and records it here for the editor, who
+   * sees it in /admin and on the draft preview. Not shown on the public page.
+   */
+  guideConflicts?: GuideConflict[];
   reviewedOn: string;
   guideVersion?: string;
   model?: string;

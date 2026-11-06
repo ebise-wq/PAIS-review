@@ -4,6 +4,7 @@ import { setFrontmatterField } from '@/lib/frontmatter';
 import matter from 'gray-matter';
 import { getAllReviews } from '@/lib/reviews';
 import { factCheckSummary, totalTokens } from '@/lib/process';
+import { sessionCost } from '@/lib/pricing';
 import { isSignedIn } from '@/lib/session';
 import { GithubError, getFile, getGithubConfig, putFile } from '@/lib/github';
 import { TAGS_PATH, checkReviewTags, parseTagList } from '@/lib/tags';
@@ -28,6 +29,7 @@ export async function GET() {
     reviewedOn: review.reviewedOn,
     guideVersion: review.guideVersion ?? null,
     guideNotes: review.guideNotes ?? [],
+    guideConflicts: review.guideConflicts ?? [],
     humanInput: review.humanInput ?? null,
     preprint: Boolean(review.preprint),
     conditions: review.conditions ?? [],
@@ -39,6 +41,7 @@ export async function GET() {
     tokens: review.process?.tokens
       ? { total: totalTokens(review.process.tokens), cached: review.process.tokens.cacheRead }
       : null,
+    cost: review.process?.tokens ? (sessionCost(review.process.tokens, review.process.tokensByModel, review.model) ?? null) : null,
     minutes: review.process?.session?.minutes ?? null,
     factCheck: review.process?.factCheck ? factCheckSummary(review.process.factCheck.findings) : null,
   }));

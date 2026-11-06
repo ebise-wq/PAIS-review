@@ -21,6 +21,7 @@ import os from 'node:os';
 import path from 'node:path';
 import { sessionUrl, sumUsage } from '../src/lib/session-stats.ts';
 import { factCheckSummary, parseProcess, readableCount, totalTokens } from '../src/lib/process.ts';
+import { PRICES_CHECKED, formatDollars, sessionCost } from '../src/lib/pricing.ts';
 
 const args = process.argv.slice(2);
 const option = (name) => {
@@ -103,6 +104,7 @@ const commit = existing.commit ?? headCommit();
 const record = {
   ...existing,
   tokens: totals.tokens,
+  tokensByModel: totals.byModel,
   session: { minutes: totals.minutes, ...(url ? { url } : {}) },
   ...(commit ? { commit } : {}),
   original: existing.original && !resetOriginal ? existing.original : snapshot(),
@@ -110,9 +112,14 @@ const record = {
 fs.writeFileSync(recordPath, `${JSON.stringify(record, null, 2)}\n`);
 
 const { process: parsed, problems } = parseProcess(record);
+const cost = sessionCost(totals.tokens, totals.byModel, matter(fs.readFileSync(reviewPath, 'utf8')).data.model);
 console.log(
   `${recordPath}: ${readableCount(totalTokens(totals.tokens))} tokens over ${totals.calls} model calls ` +
-    `(${files.length} transcript file${files.length === 1 ? '' : 's'}), ${totals.minutes} active minutes. ` +
+    `(${files.length} transcript file${files.length === 1 ? '' : 's'}; ${Object.keys(totals.byModel).join(', ') || 'no model recorded'}), ` +
+    `${totals.minutes} active minutes. ` +
+    (cost === undefined
+      ? 'No API price is known for a model in it, so no cost is shown. '
+      : `About ${formatDollars(cost)} at API prices checked ${PRICES_CHECKED}. `) +
     (parsed.factCheck ? `Fact check: ${factCheckSummary(parsed.factCheck.findings)}` : 'No fact check recorded yet.'),
 );
 for (const problem of problems) console.error(`  Problem: ${problem}`);

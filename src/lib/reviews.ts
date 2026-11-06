@@ -3,7 +3,7 @@ import path from 'node:path';
 import matter from 'gray-matter';
 import { parseProcess, type ReviewProcess } from './process';
 import { reconcileGrade } from './hoist';
-import { HUMAN_INPUT_LEVELS, REVIEW_KINDS, SIGNALS, accessOf, isHumanInput, type ContextNote, type Review, type ReviewFrontmatter, type ReviewKind, type Signal } from './types';
+import { HUMAN_INPUT_LEVELS, REVIEW_KINDS, SIGNALS, accessOf, guideConflictsOf, isHumanInput, type ContextNote, type Review, type ReviewFrontmatter, type ReviewKind, type Signal } from './types';
 
 const REVIEWS_DIR = path.join(process.cwd(), 'content', 'reviews');
 
@@ -121,6 +121,7 @@ function coerce(data: Record<string, unknown>, slug: string, body: string): Revi
     weaknesses: strings(data.weaknesses),
     context: contextNotes(data.context),
     guideNotes: strings(data.guideNotes),
+    guideConflicts: guideConflictsOf(data.guideConflicts),
     reviewedOn,
     guideVersion: data.guideVersion != null ? String(data.guideVersion) : undefined,
     model: typeof data.model === 'string' ? data.model : undefined,
