@@ -1,7 +1,7 @@
 ---
 title: Guide to peer review in post-acute infection syndromes
-version: "0.10.2"
-updated: 2026-10-29
+version: "0.11"
+updated: 2026-11-06
 authors: The editor (main), Claude
 
 ---
@@ -223,12 +223,21 @@ Often skewed by:
 
 Also ask: does it have appropriate controls? Is it a prospective design?
 
+Controls who were never tested inflate how much illness gets attributed to COVID-19. People who get
+tested are often already at a healthcare visit, or more likely to seek care, so they have more
+later diagnoses whatever the test result. Comparing infected people with untested people credits
+those diagnoses to COVID-19. Controls who tested negative are a fairer comparison, but they bias
+towards finding nothing: they were often tested because of another illness, and many get infected
+later without a record.
+
 ### Other disease-specific considerations
 
 Could hypovolemia affect the comparability of blood levels?
 
 ## Changelog
 
+- **0.11** (2026-11-06) — Epidemiology: controls who were never tested inflate how much illness
+  is attributed to COVID-19; test-negative controls are fairer but bias towards finding nothing.
 - **0.10.2** (2026-10-29) — Review skill: one command fetches the paper, figures,
   supplement and trial registration; the review is done in one pass, figures included; long
   text is kept out of the session. To make reviews cheaper. No criteria changed.
