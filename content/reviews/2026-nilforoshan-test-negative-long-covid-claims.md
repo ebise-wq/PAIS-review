@@ -11,7 +11,6 @@ topics: ["epidemiology", "course-outcomes", "meta-research"]
 kind: paper
 reviewedOn: 2026-11-06
 guideVersion: "0.10.2"
-draft: true
 model: "claude-opus-5-5"
 effort: "medium"
 read:
@@ -43,6 +42,7 @@ guideNotes:
   - "Population-average effects: a risk ratio averaged over everyone infected can sit near 1 even when a minority is badly affected; reviews of claims and records studies should check whether the estimand can detect a minority syndrome."
   - "Code lists: check that outcome labels match their codes (here, 'post-exertional fatigue' is an overexertion injury code and 'brain fog' is mostly dementia, coma and procedure codes)."
   - "Control contamination over time in infection cohorts: compare recorded infections in controls with seroprevalence for the same period."
+humanInput: none
 ---
 
 ## Study design
