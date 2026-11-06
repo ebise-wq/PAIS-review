@@ -90,3 +90,10 @@ test('the summary says, per severity, what happened to each issue', () => {
   assert.equal(factCheckSummary([]), 'No issues found.');
   assert.equal(readableCount(2_430_000), '2.4 million');
 });
+
+test('the stored cost is read back as recorded, not recomputed', () => {
+  const { process, problems } = parseProcess({ cost: { usd: 2.2, pricesChecked: '2026-10-06' } });
+  assert.deepEqual(process.cost, { usd: 2.2, pricesChecked: '2026-10-06' });
+  assert.equal(parseProcess({ cost: { usd: 'two' } }).problems.length, 1);
+  assert.equal(problems.length, 0);
+});

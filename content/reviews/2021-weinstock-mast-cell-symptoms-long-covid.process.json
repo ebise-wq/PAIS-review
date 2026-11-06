@@ -69,6 +69,10 @@
     "cacheRead": 4983573,
     "cacheWrite": 249207
   },
+  "cost": {
+    "usd": 3.83,
+    "pricesChecked": "2026-10-06"
+  },
   "session": {
     "minutes": 18,
     "url": "https://claude.ai/code/session_01JaVG7S4uzEpmQBAbubgqf5"

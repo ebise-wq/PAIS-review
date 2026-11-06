@@ -21,7 +21,7 @@ import { compareReviews, methodChangesSince, parseChangelog, splitChangelog } fr
 import { getDoc } from '@/lib/doc';
 import { ReviewChanges } from '@/components/ReviewChanges';
 import { OUTCOME_LABELS, SEVERITY_LABELS, factCheckSummary, readableCount, totalTokens } from '@/lib/process';
-import { PRICES_CHECKED, formatDollars, sessionCost } from '@/lib/pricing';
+import { formatDollars } from '@/lib/pricing';
 
 /**
  * A review as readers see it. The public page and the admin draft preview both render this,
@@ -42,7 +42,6 @@ export function ReviewView({ review, banner }: { review: Review; banner?: ReactN
   const tagList = getTags();
   const read = readList(review);
   const record = review.process;
-  const cost = record?.tokens ? sessionCost(record.tokens, record.tokensByModel, review.model) : undefined;
   // What changed after Claude handed the review over, and in the method since it was written.
   const changes = record?.original
     ? compareReviews(record.original, {
@@ -310,11 +309,11 @@ export function ReviewView({ review, banner }: { review: Review; banner?: ReactN
                 {readableCount(totalTokens(record.tokens))} tokens
               </abbr>
               {record.session?.minutes ? ` over ${record.session.minutes} active minutes` : ''}
-              {cost !== undefined && (
+              {record.cost && (
                 <>
                   , about{' '}
-                  <abbr title={`At Anthropic's list prices for the API, checked ${PRICES_CHECKED}. A subscription is billed differently.`}>
-                    {formatDollars(cost)} at current API prices
+                  <abbr title={`At Anthropic's list prices for the API as checked on ${record.cost.pricesChecked}. A subscription is billed differently.`}>
+                    {formatDollars(record.cost.usd)} at API prices at the time
                   </abbr>
                 </>
               )}

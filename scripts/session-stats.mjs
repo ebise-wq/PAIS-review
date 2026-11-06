@@ -100,11 +100,13 @@ function headCommit() {
   }
 }
 
+const cost = sessionCost(totals.tokens, totals.byModel, matter(fs.readFileSync(reviewPath, 'utf8')).data.model);
 const commit = existing.commit ?? headCommit();
 const record = {
   ...existing,
   tokens: totals.tokens,
   tokensByModel: totals.byModel,
+  ...(cost !== undefined ? { cost: { usd: Math.round(cost * 100) / 100, pricesChecked: PRICES_CHECKED } } : {}),
   session: { minutes: totals.minutes, ...(url ? { url } : {}) },
   ...(commit ? { commit } : {}),
   original: existing.original && !resetOriginal ? existing.original : snapshot(),
@@ -112,7 +114,6 @@ const record = {
 fs.writeFileSync(recordPath, `${JSON.stringify(record, null, 2)}\n`);
 
 const { process: parsed, problems } = parseProcess(record);
-const cost = sessionCost(totals.tokens, totals.byModel, matter(fs.readFileSync(reviewPath, 'utf8')).data.model);
 console.log(
   `${recordPath}: ${readableCount(totalTokens(totals.tokens))} tokens over ${totals.calls} model calls ` +
     `(${files.length} transcript file${files.length === 1 ? '' : 's'}; ${Object.keys(totals.byModel).join(', ') || 'no model recorded'}), ` +

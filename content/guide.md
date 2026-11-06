@@ -232,7 +232,7 @@ Could hypovolemia affect the comparability of blood levels?
 - **0.11** (2026-11-06) — Instructions: where the reviewer's judgement and the guide
   disagree, the review applies the more rigorous of the two and records the conflict for the
   editor. Guide notes are graded major, moderate or minor, and only major ones are kept.
-  Review pages show what the session would cost at current API prices.
+  Review pages show what the session cost at API prices at the time.
 - **0.10.2** (2026-10-29) — Review skill: one command fetches the paper, figures,
   supplement and trial registration; the review is done in one pass, figures included; long
   text is kept out of the session. To make reviews cheaper. No criteria changed.

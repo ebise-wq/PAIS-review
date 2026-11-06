@@ -25,7 +25,7 @@ interface Row {
   signal: Signal | null;
   verdict: string;
   tokens: { total: number; cached: number } | null;
-  /** US dollars at current API prices; null if unknown. */
+  /** US dollars at API prices when the review was recorded; null if not recorded. */
   cost: number | null;
   minutes: number | null;
   /** One line, e.g. "1 major (fixed); 2 moderate (1 fixed, 1 disputed)". */

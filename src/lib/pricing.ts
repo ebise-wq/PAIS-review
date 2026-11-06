@@ -1,8 +1,8 @@
 /**
- * What a review's tokens would cost at Anthropic's list prices for the API, in US dollars.
- * Worked out when the page is built, from the prices below, so every review is shown at
- * today's prices rather than the ones in force when it was written. When prices change,
- * update the table and the date with it.
+ * What a review session's tokens cost at Anthropic's list prices for the API, in US dollars.
+ * Used once, by scripts/session-stats.mjs, which stores the figure in the review's
+ * .process.json with the date below. The page shows that stored figure, so a review keeps
+ * the prices of its time; changing this table never changes an existing review.
  *
  * A Claude Code session on a subscription is not billed this way; the figure is what the
  * same work would cost through the API.

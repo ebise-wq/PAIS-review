@@ -118,8 +118,8 @@ Everything printed in a session stays in it and is read again on every later ste
    version, and the review as it
    stands now (readers see later changes compared against it, so run it after your own
    fixes) to the `.process.json` file, and checks the findings you wrote; fix anything it
-   reports. It also prints what the session would cost at current API prices: tell the user
-   that figure. The review page shows it too, worked out from `src/lib/pricing.ts`. The totals cover the whole session, so
+   reports. It also records and prints what the session cost at API prices: tell the user
+   that figure. The review page shows it. The totals cover the whole session, so
    write one review per session. Commit the `.process.json` file with the review.
 6. Save it as a draft: add `draft: true` to the frontmatter. Commit and push only when the
    user says so. A draft is not on the site; the user reads it in the site design at

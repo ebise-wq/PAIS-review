@@ -34,6 +34,11 @@ export interface ReviewProcess {
   tokens?: TokenTotals;
   /** The same totals for each model that ran, so each is priced at its own rate. */
   tokensByModel?: Record<string, TokenTotals>;
+  /**
+   * What the session cost at Anthropic's API list prices when it was recorded, and the date
+   * those prices were checked. Stored, not recomputed: it stays at the prices of the time.
+   */
+  cost?: { usd: number; pricesChecked: string };
   /** Active minutes, and the claude.ai link for a cloud session. */
   session?: { minutes?: number; url?: string };
   /** Present once a fact check has run, even if it found nothing. */
@@ -82,6 +87,14 @@ export function parseProcess(raw: unknown): { process: ReviewProcess; problems: 
       else problems.push(`"tokensByModel" for ${model} needs input, output, cacheRead and cacheWrite as whole numbers.`);
     }
     if (Object.keys(byModel).length) process.tokensByModel = byModel;
+  }
+
+  if (record.cost !== undefined) {
+    const cost = record.cost && typeof record.cost === 'object' ? (record.cost as Record<string, unknown>) : {};
+    const usd = typeof cost.usd === 'number' && Number.isFinite(cost.usd) && cost.usd >= 0 ? cost.usd : undefined;
+    const date = typeof cost.pricesChecked === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(cost.pricesChecked) ? cost.pricesChecked : undefined;
+    if (usd !== undefined && date) process.cost = { usd, pricesChecked: date };
+    else problems.push('"cost" needs usd as a number and pricesChecked as a YYYY-MM-DD date.');
   }
 
   const session = record.session as Record<string, unknown> | undefined;
