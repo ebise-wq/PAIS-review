@@ -9,7 +9,6 @@ studyType: "Weighted household survey, 269,971 responses over four weeks to 5 Ma
 design: observational
 topics: ["epidemiology", "course-outcomes"]
 kind: paper
-draft: true
 reviewedOn: 2026-11-09
 guideVersion: "0.10.1"
 model: "claude-opus-5-5"
@@ -45,6 +44,7 @@ guideNotes:
   - "Survey prevalence: confidence intervals cover sampling error only; weigh non-response and misclassification instead"
   - "Duration counted from first infection, ignoring reinfection, is not illness duration"
   - "Repeated surveys: check for changes of data collection method before reading a trend"
+humanInput: none
 ---
 
 ## Study design
