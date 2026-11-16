@@ -1001,3 +1001,6 @@ a[href$='#grade-scheme'] { text-decoration-style: dotted; text-underline-offset:
 .catalogue-top { padding-left: 22px; }
 .catalogue-top li { margin-bottom: 8px; font-size: 0.92rem; }
 .catalogue-meta { color: var(--muted); }
+.catalogue-filters { display: flex; gap: 6px; flex-wrap: wrap; margin: 6px 0 4px; }
+.catalogue-filters .active { font-weight: 600; border-color: var(--text); }
+.catalogue-review a { font-weight: 600; }

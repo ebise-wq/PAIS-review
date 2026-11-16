@@ -2,7 +2,7 @@
 // when TEST_DATABASE_URL names one on this machine, as in db.test.mjs.
 import { test, after } from 'node:test';
 import assert from 'node:assert/strict';
-import { accessOf, conditionsOf, kindOf, toRow } from '../src/lib/catalogue.ts';
+import { accessOf, conditionsOf, kindOf, reviewEntry, toRow } from '../src/lib/catalogue.ts';
 
 test('kinds: preprints, reviews by label or title, commentary, research', () => {
   assert.equal(kindOf('PPR', [], 'Anything'), 'preprint');
@@ -108,10 +108,82 @@ test('the sync reads page by page, resumes, finishes a pass, then waits a week',
   assert.equal(stats.total, 5);
   assert.equal(stats.byCondition['Long COVID'], 5);
 
-  const top = await lib.topUnreviewed(['10.1/ABC5'], 3);
-  assert.deepEqual(top.map((p) => p.doi), ['10.1/abc4', '10.1/abc3', '10.1/abc2']);
+  await db.query('delete from catalogue_reviews');
+  const top = await lib.listPapers('unreviewed', 3);
+  assert.deepEqual(top.map((p) => p.doi), ['10.1/abc5', '10.1/abc4', '10.1/abc3']);
   const csv = await lib.catalogueCsv();
   assert.match(csv.split('\n')[1], /^10\.1\/abc5,/);
+});
+
+const review = (slug, extra = {}) => ({ slug, title: `Review ${slug}`, kind: 'paper', score: 6.5, reviewedOn: '2026-11-01', guideVersion: '0.10', ...extra });
+
+test('a review file becomes a catalogue entry, with its DOI normalised', () => {
+  const entry = reviewEntry(review('a', { doi: 'https://doi.org/10.1/ABC5', draft: true }));
+  assert.deepEqual(entry, {
+    slug: 'a',
+    doi: '10.1/abc5',
+    title: 'Review a',
+    kind: 'paper',
+    status: 'draft',
+    score: 6.5,
+    signal: null,
+    reviewed_on: '2026-11-01',
+    guide_version: '0.10',
+  });
+  assert.equal(reviewEntry(review('b')).doi, null);
+  assert.equal(reviewEntry(review('b')).status, 'published');
+});
+
+test('reviews are marked from the files, matched by DOI, and listed by status', { skip }, async () => {
+  await db.query('delete from catalogue_reviews');
+  // Papers 1-5 exist from the sync test above.
+  const files = [
+    reviewEntry(review('five', { doi: '10.1/ABC5' })),
+    reviewEntry(review('four', { doi: '10.1/abc4', draft: true, score: undefined })),
+    reviewEntry(review('no-doi')),
+  ];
+  assert.deepEqual(await lib.markReviews(files), { marked: 3, removed: 0 });
+
+  const unreviewed = await lib.listPapers('unreviewed', 10);
+  assert.deepEqual(unreviewed.map((p) => p.doi), ['10.1/abc3', '10.1/abc2', '10.1/abc1']);
+  const [published] = await lib.listPapers('published', 10);
+  assert.equal(published.review_slug, 'five');
+  assert.equal(published.review_score, 6.5);
+  const [draft] = await lib.listPapers('drafts', 10);
+  assert.equal(draft.review_slug, 'four');
+  assert.equal(draft.review_status, 'draft');
+
+  const stats = await lib.catalogueStats();
+  assert.deepEqual(stats.reviews, { published: 2, draft: 1, unmatched: 1 });
+  assert.match(await lib.catalogueCsv(), /\n10\.1\/abc5,.*,published,five,6\.5,\n/);
+
+  // A file that is gone is removed on the next mark.
+  assert.deepEqual(await lib.markReviews(files.slice(0, 2)), { marked: 2, removed: 1 });
+});
+
+test('a status set by publishing is kept until the deployed files catch up', { skip }, async () => {
+  await db.query('delete from catalogue_reviews');
+  const draft = reviewEntry(review('four', { doi: '10.1/abc4', draft: true }));
+  await lib.markReviews([draft]);
+
+  // Published in admin: marked at once and pinned.
+  await lib.markReview({ ...draft, status: 'published' });
+  // The deployed files still say draft; a full mark must not undo the publish.
+  await lib.markReviews([draft]);
+  let [row] = await db.query(`select status from catalogue_reviews where slug = 'four'`);
+  assert.equal(row.status, 'published');
+
+  // A new review published in admin is not removed while its file has not deployed.
+  await lib.markReview(reviewEntry(review('brand-new', { doi: '10.1/abc3' })));
+  assert.deepEqual(await lib.markReviews([draft]), { marked: 1, removed: 0 });
+
+  // Once the pin has run out, the files are the record again.
+  await db.query(`update catalogue_reviews set pinned_until = now() - interval '1 minute'`);
+  await lib.markReviews([{ ...draft, status: 'published' }]);
+  [row] = await db.query(`select status from catalogue_reviews where slug = 'four'`);
+  assert.equal(row.status, 'published');
+  const remaining = await db.query('select slug from catalogue_reviews order by slug');
+  assert.deepEqual(remaining.map((r) => r.slug), ['four']);
 });
 
 test('a failed fetch is recorded and the cursor kept', { skip }, async () => {

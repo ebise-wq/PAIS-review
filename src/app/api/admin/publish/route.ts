@@ -4,6 +4,7 @@ import { currentGuideVersion } from '@/lib/doc';
 import { isHumanInput } from '@/lib/types';
 import { isSignedIn } from '@/lib/session';
 import { GithubError, getFileSha, getGithubConfig, putFile } from '@/lib/github';
+import { markReviewQuietly } from '@/lib/catalogue-marking';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -68,6 +69,7 @@ export async function POST(request: Request) {
       sha,
     );
 
+    await markReviewQuietly({ ...built.review, slug: built.slug });
     return NextResponse.json({ ok: true, slug: built.slug, path, draft, ...result });
   } catch (error) {
     if (error instanceof GithubError) return fail(error.message, error.status);

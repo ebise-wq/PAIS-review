@@ -37,4 +37,23 @@ create table if not exists catalogue_sync (
   last_error    text
 );
 insert into catalogue_sync (id) values (1) on conflict do nothing;
+
+-- The site's own reviews, one row each, copied from the review files so the catalogue can
+-- say which papers are reviewed. Matched to papers by DOI. pinned_until protects a status
+-- just set by publishing or withdrawing from being overwritten by the deployed files, which
+-- lag behind until Vercel has rebuilt.
+create table if not exists catalogue_reviews (
+  slug           text primary key,
+  doi            text,
+  title          text not null,
+  kind           text not null,
+  status         text not null check (status in ('draft', 'published')),
+  score          numeric,
+  signal         text,
+  reviewed_on    date,
+  guide_version  text,
+  pinned_until   timestamptz,
+  updated_at     timestamptz not null default now()
+);
+create index if not exists catalogue_reviews_doi_idx on catalogue_reviews (doi);
 `;

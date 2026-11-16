@@ -13,10 +13,12 @@
     "restore-backup": "node --import tsx scripts/restore-backup.mjs",
     "test": "node --import tsx --test tests/*.test.mjs",
     "fetch-sources": "NODE_USE_ENV_PROXY=1 node --disable-warning=UNDICI-EHPA --import tsx scripts/fetch-sources.mjs",
-    "catalogue-sync": "NODE_USE_ENV_PROXY=1 node --disable-warning=UNDICI-EHPA --import tsx scripts/catalogue-sync.mjs"
+    "catalogue-sync": "NODE_USE_ENV_PROXY=1 node --disable-warning=UNDICI-EHPA --import tsx scripts/catalogue-sync.mjs",
+    "catalogue-query": "NODE_USE_ENV_PROXY=1 node --disable-warning=UNDICI-EHPA --import tsx scripts/catalogue-query.mjs"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.126.0",
+    "@neondatabase/serverless": "1.2.0",
     "diff": "8.0.4",
     "gray-matter": "^4.0.3",
     "next": "^15.5.28",

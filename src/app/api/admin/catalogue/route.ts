@@ -1,8 +1,8 @@
 import { NextResponse } from 'next/server';
 import { isSignedIn } from '@/lib/session';
 import { dbConfigured, describeDbError } from '@/lib/db';
-import { getAllReviews } from '@/lib/reviews';
-import { catalogueStats, syncCatalogue, syncState, topUnreviewed } from '@/lib/catalogue';
+import { PAPER_FILTERS, catalogueStats, listPapers, syncCatalogue, syncState, type PaperFilter } from '@/lib/catalogue';
+import { markAllReviews } from '@/lib/catalogue-marking';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -12,37 +12,40 @@ function fail(message: string, status: number) {
   return NextResponse.json({ error: message }, { status });
 }
 
-/** DOIs of every review on the site, drafts included, so the list leaves them out. */
-const reviewedDois = () =>
-  getAllReviews({ includeDrafts: true })
-    .map((review) => review.doi)
-    .filter((doi): doi is string => Boolean(doi));
+const filterOf = (request: Request): PaperFilter => {
+  const value = new URL(request.url).searchParams.get('filter') as PaperFilter | null;
+  return value && PAPER_FILTERS.includes(value) ? value : 'unreviewed';
+};
 
-async function snapshot() {
+/** Opening the tab also brings the record of reviews up to date with the review files. */
+async function snapshot(filter: PaperFilter) {
+  const marked = await markAllReviews();
   return {
     stats: await catalogueStats(),
     sync: await syncState(),
-    top: await topUnreviewed(reviewedDois()),
+    filter,
+    papers: await listPapers(filter),
+    marked,
   };
 }
 
-export async function GET() {
+export async function GET(request: Request) {
   if (!(await isSignedIn())) return fail('Sign in first.', 401);
   if (!dbConfigured()) return fail('No database is connected, so there is no catalogue yet.', 503);
   try {
-    return NextResponse.json(await snapshot());
+    return NextResponse.json(await snapshot(filterOf(request)));
   } catch (error) {
     return fail(describeDbError(error), 502);
   }
 }
 
 /** Fetches the next batch from Europe PMC by hand, without waiting for the daily run. */
-export async function POST() {
+export async function POST(request: Request) {
   if (!(await isSignedIn())) return fail('Sign in first.', 401);
   if (!dbConfigured()) return fail('No database is connected.', 503);
   try {
     const result = await syncCatalogue({ pages: 2, force: true });
-    return NextResponse.json({ result, ...(await snapshot()) });
+    return NextResponse.json({ result, ...(await snapshot(filterOf(request))) });
   } catch (error) {
     return fail(error instanceof Error && !('code' in error) ? error.message : describeDbError(error), 502);
   }

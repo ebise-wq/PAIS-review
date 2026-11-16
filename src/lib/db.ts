@@ -15,10 +15,17 @@ function looksLikePostgres(value: string | undefined): value is string {
   return Boolean(value && /^postgres(ql)?:\/\//i.test(value));
 }
 
+/**
+ * The read-only role sessions use to query the catalogue (scripts/catalogue-query.mjs). The
+ * site never uses it: it cannot write comments or ratings, and sessions cannot open a normal
+ * Postgres connection anyway.
+ */
+const NOT_FOR_THE_SITE = new Set(['CATALOGUE_DATABASE_URL']);
+
 /** Names (never values) of every environment variable holding a Postgres URL. */
 export function postgresEnvNames(): string[] {
   return Object.keys(process.env)
-    .filter((name) => looksLikePostgres(process.env[name]))
+    .filter((name) => !NOT_FOR_THE_SITE.has(name) && looksLikePostgres(process.env[name]))
     .sort();
 }
 

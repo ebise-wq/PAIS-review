@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server';
 import { timingSafeEqual } from 'node:crypto';
 import { dbConfigured } from '@/lib/db';
 import { syncCatalogue } from '@/lib/catalogue';
+import { markAllReviews } from '@/lib/catalogue-marking';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -20,7 +21,8 @@ export async function GET(request: Request) {
   if (!ok) return NextResponse.json({ error: 'Not allowed.' }, { status: 401 });
   if (!dbConfigured()) return NextResponse.json({ error: 'No database is connected.' }, { status: 503 });
   try {
-    return NextResponse.json(await syncCatalogue({ pages: 10 }));
+    const marked = await markAllReviews();
+    return NextResponse.json({ ...(await syncCatalogue({ pages: 10 })), marked });
   } catch (error) {
     return NextResponse.json({ error: error instanceof Error ? error.message : 'Sync failed.' }, { status: 502 });
   }

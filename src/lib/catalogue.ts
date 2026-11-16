@@ -251,6 +251,7 @@ export interface CatalogueStats {
   byAccess: Record<string, number>;
   inTitle: number;
   retracted: number;
+  reviews: { published: number; draft: number; unmatched: number };
 }
 
 export async function catalogueStats(): Promise<CatalogueStats> {
@@ -259,6 +260,12 @@ export async function catalogueStats(): Promise<CatalogueStats> {
   );
   const group = async (sql: string) =>
     Object.fromEntries((await query<{ key: string; n: string }>(sql)).map((r) => [r.key, Number(r.n)]));
+  const [reviews] = await query<{ published: string; draft: string; unmatched: string }>(
+    `select count(*) filter (where status = 'published') as published,
+            count(*) filter (where status = 'draft') as draft,
+            count(*) filter (where not exists (select 1 from papers p where p.doi = r.doi)) as unmatched
+       from catalogue_reviews r`,
+  );
   return {
     total: Number(totals.total),
     inTitle: Number(totals.in_title),
@@ -266,7 +273,90 @@ export async function catalogueStats(): Promise<CatalogueStats> {
     byKind: await group('select kind as key, count(*) as n from papers group by kind'),
     byCondition: await group('select unnest(conditions) as key, count(*) as n from papers group by 1'),
     byAccess: await group(`select access as key, count(*) as n from papers where kind = 'research' group by access`),
+    reviews: { published: Number(reviews.published), draft: Number(reviews.draft), unmatched: Number(reviews.unmatched) },
   };
+}
+
+// ---------------------------------------------------------------------------------------
+// Which papers the site has reviewed. The review files are the record; this copies them in.
+
+export type ReviewStatus = 'draft' | 'published';
+
+export interface ReviewEntry {
+  slug: string;
+  doi: string | null;
+  title: string;
+  kind: string;
+  status: ReviewStatus;
+  score: number | null;
+  signal: string | null;
+  reviewed_on: string | null;
+  guide_version: string | null;
+}
+
+/** A review, as the site reads it from its file, as a catalogue entry. */
+export function reviewEntry(review: {
+  slug: string;
+  doi?: string;
+  title: string;
+  kind: string;
+  draft?: boolean;
+  score?: number;
+  signal?: string;
+  reviewedOn?: string;
+  guideVersion?: string;
+}): ReviewEntry {
+  const doi = review.doi?.trim().replace(/^https?:\/\/(dx\.)?doi\.org\//i, '').toLowerCase();
+  return {
+    slug: review.slug,
+    doi: doi || null,
+    title: review.title,
+    kind: review.kind,
+    status: review.draft ? 'draft' : 'published',
+    score: typeof review.score === 'number' ? review.score : null,
+    signal: review.signal ?? null,
+    reviewed_on: review.reviewedOn && /^\d{4}-\d{2}-\d{2}$/.test(review.reviewedOn) ? review.reviewedOn : null,
+    guide_version: review.guideVersion ?? null,
+  };
+}
+
+/** Minutes a status set by publishing or withdrawing is kept, while Vercel rebuilds. */
+export const PIN_MINUTES = 15;
+
+const ENTRY_COLUMNS: (keyof ReviewEntry)[] = ['slug', 'doi', 'title', 'kind', 'status', 'score', 'signal', 'reviewed_on', 'guide_version'];
+
+async function upsertEntry(entry: ReviewEntry, pin: boolean): Promise<void> {
+  const params = ENTRY_COLUMNS.map((c) => entry[c]);
+  const updates = ENTRY_COLUMNS.filter((c) => c !== 'slug').map((c) => `${c} = excluded.${c}`);
+  await query(
+    `insert into catalogue_reviews (${ENTRY_COLUMNS.join(', ')}, pinned_until)
+     values (${ENTRY_COLUMNS.map((_, i) => `$${i + 1}`).join(', ')}, ${pin ? `now() + interval '${PIN_MINUTES} minutes'` : 'null'})
+     on conflict (slug) do update set ${updates.join(', ')}, pinned_until = excluded.pinned_until, updated_at = now()
+     ${pin ? '' : 'where catalogue_reviews.pinned_until is null or catalogue_reviews.pinned_until < now()'}`,
+    params,
+  );
+}
+
+/**
+ * Brings the catalogue's record of reviews into line with the review files: adds and updates
+ * each one, and removes reviews that no longer exist. Entries just set by publishing or
+ * withdrawing are left alone until their pin runs out, because the deployed files may not
+ * have caught up yet.
+ */
+export async function markReviews(entries: ReviewEntry[]): Promise<{ marked: number; removed: number }> {
+  for (const entry of entries) await upsertEntry(entry, false);
+  const removed = await query(
+    `delete from catalogue_reviews
+      where not (slug = any($1::text[])) and (pinned_until is null or pinned_until < now())
+      returning slug`,
+    [entries.map((e) => e.slug)],
+  );
+  return { marked: entries.length, removed: removed.length };
+}
+
+/** Records one review's new status straight away, when it is published, drafted or withdrawn. */
+export async function markReview(entry: ReviewEntry): Promise<void> {
+  await upsertEntry(entry, true);
 }
 
 export interface CataloguePaper {
@@ -281,18 +371,44 @@ export interface CataloguePaper {
   access: Access;
   best_url: string | null;
   retracted: boolean;
+  review_slug: string | null;
+  review_status: ReviewStatus | null;
+  review_score: number | null;
+  review_signal: string | null;
 }
 
-/** The most-cited research papers whose condition is in their title, leaving out the given DOIs. */
-export async function topUnreviewed(reviewedDois: string[], limit = 25): Promise<CataloguePaper[]> {
-  return query<CataloguePaper>(
-    `select id, doi, title, authors, journal, year, conditions, cited_by, access, best_url, retracted
-       from papers
-      where kind = 'research' and in_title and not (coalesce(doi, '') = any($1::text[]))
-      order by cited_by desc
-      limit $2`,
-    [reviewedDois.map((d) => d.toLowerCase()), limit],
+export type PaperFilter = 'unreviewed' | 'drafts' | 'published';
+export const PAPER_FILTERS: PaperFilter[] = ['unreviewed', 'drafts', 'published'];
+
+// A paper's review, if any: a published one before a draft, the newest first.
+const REVIEW_JOIN = `
+  left join lateral (
+    select slug, status, score, signal from catalogue_reviews r
+     where r.doi = p.doi
+     order by (status = 'published') desc, reviewed_on desc nulls last
+     limit 1
+  ) r on p.doi is not null`;
+
+/**
+ * Research papers with the condition in their title, most cited first, with their review if
+ * the site has one. "unreviewed" leaves out every paper with a review, draft or published.
+ */
+export async function listPapers(filter: PaperFilter = 'unreviewed', limit = 25): Promise<CataloguePaper[]> {
+  const where = {
+    unreviewed: 'r.slug is null',
+    drafts: "r.status = 'draft'",
+    published: "r.status = 'published'",
+  }[filter];
+  const rows = await query<CataloguePaper & { review_score: string | null }>(
+    `select p.id, p.doi, p.title, p.authors, p.journal, p.year, p.conditions, p.cited_by, p.access, p.best_url, p.retracted,
+            r.slug as review_slug, r.status as review_status, r.score as review_score, r.signal as review_signal
+       from papers p ${REVIEW_JOIN}
+      where p.kind = 'research' and p.in_title and ${where}
+      order by p.cited_by desc
+      limit $1`,
+    [limit],
   );
+  return rows.map((row) => ({ ...row, review_score: row.review_score == null ? null : Number(row.review_score) }));
 }
 
 const csvCell = (value: unknown) => {
@@ -300,9 +416,16 @@ const csvCell = (value: unknown) => {
   return /[",\n]/.test(text) ? `"${text.replace(/"/g, '""')}"` : text;
 };
 
-/** The whole catalogue as CSV, abstracts left out, most cited first. */
+/** The whole catalogue as CSV, abstracts left out, most cited first, with each paper's review. */
 export async function catalogueCsv(): Promise<string> {
-  const columns = ['doi', 'pmid', 'pmcid', 'title', 'authors', 'journal', 'year', 'kind', 'conditions', 'in_title', 'retracted', 'cited_by', 'access', 'best_url'];
-  const rows = await query(`select ${columns.join(', ')} from papers order by cited_by desc, year desc nulls last`);
+  const columns = [
+    'doi', 'pmid', 'pmcid', 'title', 'authors', 'journal', 'year', 'kind', 'conditions', 'in_title', 'retracted',
+    'cited_by', 'access', 'best_url', 'review_status', 'review_slug', 'review_score', 'review_signal',
+  ];
+  const rows = await query(
+    `select p.*, r.status as review_status, r.slug as review_slug, r.score as review_score, r.signal as review_signal
+       from papers p ${REVIEW_JOIN}
+      order by p.cited_by desc, p.year desc nulls last`,
+  );
   return [columns.join(','), ...rows.map((row) => columns.map((c) => csvCell(row[c])).join(','))].join('\n') + '\n';
 }

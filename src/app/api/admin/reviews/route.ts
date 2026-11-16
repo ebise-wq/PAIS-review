@@ -8,6 +8,7 @@ import { isSignedIn } from '@/lib/session';
 import { GithubError, getFile, getGithubConfig, putFile } from '@/lib/github';
 import { TAGS_PATH, checkReviewTags, parseTagList } from '@/lib/tags';
 import { getTags } from '@/lib/tags-store';
+import { markReviewQuietly } from '@/lib/catalogue-marking';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -124,6 +125,20 @@ export async function POST(request: Request) {
     const data = matter(updated).data as Record<string, unknown>;
 
     const result = await putFile(github, path, updated, message, file.sha);
+    if (input.action === 'withdraw' || input.action === 'restore') {
+      const reviewedOn = data.reviewedOn instanceof Date ? data.reviewedOn.toISOString().slice(0, 10) : data.reviewedOn;
+      await markReviewQuietly({
+        slug,
+        title: String(data.title ?? slug),
+        kind: String(data.kind ?? 'paper'),
+        doi: typeof data.doi === 'string' ? data.doi : undefined,
+        draft: data.draft === true,
+        score: typeof data.score === 'number' ? data.score : undefined,
+        signal: typeof data.signal === 'string' ? data.signal : undefined,
+        reviewedOn: typeof reviewedOn === 'string' ? reviewedOn : undefined,
+        guideVersion: data.guideVersion != null ? String(data.guideVersion) : undefined,
+      });
+    }
 
     return NextResponse.json({
       ok: true,

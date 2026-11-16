@@ -17,3 +17,7 @@
   `{"date": "YYYY-MM-DD", "summary": "..."}` to `changes` in its `.process.json`, saying what
   changed and why. Never edit `original` there: readers see the review compared against it.
 - Before pushing: `npm run typecheck`, `npm test`, `npm run check:abbreviations`.
+- The paper catalogue (every PAIS paper Europe PMC indexes, with which ones the site has
+  reviewed) can be read with `npm run -s catalogue-query -- "select ..."`. See
+  `docs/catalogue.md` for the tables and example queries. It is read-only; reviews are marked
+  in it by the site, not by sessions.
